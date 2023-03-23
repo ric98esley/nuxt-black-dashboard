@@ -14,12 +14,12 @@
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  */
 export default {
-  mode: "universal",
+  ssr: false,
   /*
    ** Headers of the page
    */
   head: {
-    title: "Nuxt Black Dashboard",
+    title: "Inventario",
     meta: [
       { charset: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
@@ -33,13 +33,11 @@ export default {
       { rel: "icon", type: "image/x-icon", href: "/favicon.png" },
       {
         rel: "stylesheet",
-        href:
-          "https://fonts.googleapis.com/css?family=Poppins:200,300,400,600,700,800",
+        href: "https://fonts.googleapis.com/css?family=Poppins:200,300,400,600,700,800",
       },
       {
         rel: "stylesheet",
-        href:
-          "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.2/css/all.min.css",
+        href: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.2/css/all.min.css",
       },
     ],
     bodyAttrs: {
@@ -72,7 +70,7 @@ export default {
   /*
    ** Nuxt.js modules
    */
-  modules: ["@nuxtjs/pwa", "nuxt-i18n"],
+  modules: ["@nuxtjs/pwa", "nuxt-i18n", "@nuxtjs/axios"],
   i18n: {
     locales: [
       {
@@ -88,16 +86,28 @@ export default {
     langDir: "lang/",
     defaultLocale: "en",
   },
+  axios: {
+  },
+  env:{
+    supabaseUrl: process.env.SUPABASE_URL,
+    supabaseKey: process.env.SUPABASE_ANON_KEY
+   },
 
   server: {
     port: 3000, // default: 3000
-    host: '0.0.0.0', // default: localhost
+    host: "0.0.0.0", // default: localhost
   },
   /*
    ** Build configuration
    */
   build: {
     transpile: [/^element-ui/],
+    postcss: null,
+    loaders: {
+      vue: {
+        prettify: false,
+      },
+    },
     /*
      ** You can extend webpack config here
      */
