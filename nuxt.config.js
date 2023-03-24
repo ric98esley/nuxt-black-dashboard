@@ -78,13 +78,13 @@ export default {
         file: "en.js",
       },
       {
-        code: "ar",
-        file: "ar.js",
-      },
+        code: "es",
+        file: "es.js",
+      }
     ],
     lazy: true,
     langDir: "lang/",
-    defaultLocale: "en",
+    defaultLocale: "es",
   },
   axios: {
   },

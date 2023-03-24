@@ -46,23 +46,16 @@ export default {
         (payload) => {
           console.log('Change received!', payload)
           this.supports.push(payload.new)
+          this.$notify({
+            message: payload.Title,
+            timeout: 30000,
+            icon: 'tim-icons icon-bell-55',
+          })
         }
       )
       .subscribe()
   },
   methods: {
-    notifyVue(verticalAlign, horizontalAlign) {
-      let color = Math.floor(Math.random() * 4 + 1);
-      this.$notify({
-        message:
-          'Welcome to <b>Vue Black Dashboard Pro</b> - a beautiful resource for every web developer',
-        timeout: 30000,
-        icon: 'tim-icons icon-bell-55',
-        horizontalAlign: horizontalAlign,
-        verticalAlign: verticalAlign,
-        type: this.type[color]
-      });
-    }
   }
 };
 </script>
