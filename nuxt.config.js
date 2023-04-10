@@ -80,18 +80,19 @@ export default {
       {
         code: "es",
         file: "es.js",
-      }
+      },
     ],
     lazy: true,
     langDir: "lang/",
     defaultLocale: "es",
   },
   axios: {
+    baseURL: process.env.AXIOS_BASE_URL,
   },
-  env:{
+  env: {
     supabaseUrl: process.env.SUPABASE_URL,
-    supabaseKey: process.env.SUPABASE_ANON_KEY
-   },
+    supabaseKey: process.env.SUPABASE_ANON_KEY,
+  },
 
   server: {
     port: 3000, // default: 3000
@@ -102,12 +103,6 @@ export default {
    */
   build: {
     transpile: [/^element-ui/],
-    postcss: null,
-    loaders: {
-      vue: {
-        prettify: false,
-      },
-    },
     /*
      ** You can extend webpack config here
      */
@@ -122,6 +117,6 @@ export default {
           },
         ],
       ],
-    },
+    }
   },
 };

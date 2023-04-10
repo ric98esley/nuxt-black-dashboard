@@ -11,7 +11,7 @@
           :link="{
             name: $t('sidebar.dashboard'),
             icon: 'tim-icons icon-chart-pie-36',
-            path: '/'
+            path: '/google'
           }"
         >
         </sidebar-item>
@@ -20,6 +20,22 @@
             name: $t('sidebar.notifications'),
             icon: 'tim-icons icon-bell-55',
             path: '/notifications'
+          }"
+        >
+        </sidebar-item>
+        <sidebar-item
+          :link="{
+            name: 'Usuarios',
+            icon: 'tim-icons icon-badge',
+            path: '/users'
+          }"
+        >
+        </sidebar-item>
+        <sidebar-item
+          :link="{
+            name: 'Activos',
+            icon: 'tim-icons icon-app',
+            path: '/assets'
           }"
         >
         </sidebar-item>

@@ -59,8 +59,8 @@ export default {
   methods: {
     async logon() {
       try {
-        let {data, error} = await supabase.auth.signInWithPassword({
-          email: this.user.email,
+        let {data, error} = await this.$axios.post('login',{
+          user: this.user.email,
           password: this.user.password
         })
         if (!data.error) {
@@ -68,12 +68,12 @@ export default {
           this.$notify({
             type: "success",
             icon: "tim-icons icon-check-2",
-            message: "Bienvenido " + data.session.user.email
+            message: "Bienvenido " + data.user.username
           });
 
           const auth = {
-            token: data.session.access_token,
-            userData: data.session.user
+            token: data.token,
+            userData: data.user
           }
 
           //token to de store - token a la tienda
