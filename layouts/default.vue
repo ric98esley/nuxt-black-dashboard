@@ -39,6 +39,22 @@
           }"
         >
         </sidebar-item>
+        <sidebar-item
+          :link="{
+            name: 'Asignaciones',
+            icon: 'tim-icons icon-notes',
+            path: '/assignments'
+          }"
+        >
+        </sidebar-item>
+        <sidebar-item
+          :link="{
+            name: 'Lugares',
+            icon: 'tim-icons icon-square-pin',
+            path: '/places'
+          }"
+        >
+        </sidebar-item>
 
       </template>
     </side-bar>

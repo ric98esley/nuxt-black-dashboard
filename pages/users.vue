@@ -1,5 +1,9 @@
 <template>
   <div class="row">
+    <div class="col-md-12">
+      <h1>Usuarios</h1>
+    </div>
+  
     <card class="col-md-12">
       <base-input label="Buscar activo"></base-input>
     </card>
