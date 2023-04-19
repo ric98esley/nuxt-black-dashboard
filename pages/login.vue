@@ -31,16 +31,12 @@
     </div>
   </div>
 </template>
-  
 <script>
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.supabaseUrl
 const supabaseKey = process.env.supabaseKey
 const supabase = createClient(supabaseUrl, supabaseKey)
-
-const Cookie = process.client ? require("js-cookie") : undefined;
-
 
 export default {
   middleware: 'notAuthenticated',
@@ -59,7 +55,7 @@ export default {
   methods: {
     async logon() {
       try {
-        let {data, error} = await this.$axios.post('login',{
+        let { data, error } = await this.$axios.post('login', {
           user: this.user.email,
           password: this.user.password
         })
