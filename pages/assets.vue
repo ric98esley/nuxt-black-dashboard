@@ -5,12 +5,12 @@
     </div>
 
     <card class="col-md-12">
-      <base-input label="Buscar activo"></base-input>
+      <base-input label="Buscar activo" v-model="search"></base-input>
     </card>
     <!-- table -->
     <card class="col-md-9">
       <h4 slot="header" class="card-title">Lista de activos</h4>
-      <el-table :data="assets" class="table-striped">
+      <el-table :data="assets.assets" class="table-striped">
         <el-table-column min-width="150" sortable label="Serial" property="serial"></el-table-column>
         <el-table-column min-width="150" sortable label="Estado" property="state.name"></el-table-column>
         <el-table-column min-width="150" sortable label="Modelo" property="model.model"></el-table-column>
@@ -171,6 +171,7 @@ export default {
   },
   data() {
     return {
+      search: "",
       modals: {
         createAsset: false,
         createState: false,
@@ -206,6 +207,20 @@ export default {
       }
     };
   },
+  watch: {
+    search(newState,lastState ) {
+      if (newState === '') {
+        this.getAssets();
+        return
+      }
+      if (newState.length < 3) return;
+
+      this.searchAsset({
+        toSearch:newState
+      });
+
+    }
+  },
   mounted() {
     this.getAssets(),
       this.getModels(),
@@ -218,6 +233,7 @@ export default {
         console.log(this.$store.state.auth)
         this.$axios.setToken(this.$store.state.auth.token, 'Bearer')
         const { data, error } = await this.$axios.get('/assets')
+        console.log(data)
         this.assets = data;
       } catch (error) {
         console.log(error)
@@ -266,6 +282,28 @@ export default {
         obj[prop] = null
       }
       return obj;
+    },
+    async searchAsset({toSearch, limit, offset}) {
+      try {
+        let toSend = {
+          params: {
+            serial: toSearch,
+          }
+        }
+
+        if (limit && offset) {
+          toSend.params.limit = limit;
+          toSend.params.offset = offset;
+        }
+
+        this.removeNullProps(toSend);
+        this.$axios.setToken(this.$store.state.auth.token, 'Bearer');
+        const { data, error } = await this.$axios.get('/assets/search', toSend);
+
+        this.assets = data
+      } catch (error) {
+        console.log(error);
+      }
     },
     async addAsset() {
       try {
