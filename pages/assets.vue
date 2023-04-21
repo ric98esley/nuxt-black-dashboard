@@ -208,31 +208,50 @@ export default {
     };
   },
   watch: {
-    search(newState,lastState ) {
+    search(newState, lastState) {
       if (newState === '') {
-        this.getAssets();
+        this.getAssets({
+          serial: newState
+        });
         return
       }
       if (newState.length < 3) return;
 
-      this.searchAsset({
-        toSearch:newState
+      this.getAssets({
+        toSearch: newState
       });
 
     }
   },
   mounted() {
-    this.getAssets(),
+    this.getAssets({}),
       this.getModels(),
       this.getStatus(),
       this.getCategories()
   },
   methods: {
-    async getAssets() {
+    async getAssets({
+      toSearch,
+      limit,
+      offset
+    }) {
       try {
-        console.log(this.$store.state.auth)
+        let toSend = {
+          params: {
+          }
+        }
+        if (toSearch) {
+          toSend.params.serial = toSearch
+        }
+
+        if (limit && offset) {
+          toSend.params.limit = limit;
+          toSend.params.offset = offset;
+        }
+
+        this.removeNullProps(toSend);
         this.$axios.setToken(this.$store.state.auth.token, 'Bearer')
-        const { data, error } = await this.$axios.get('/assets')
+        const { data, error } = await this.$axios.get('/assets', toSend)
         console.log(data)
         this.assets = data;
       } catch (error) {
@@ -283,36 +302,15 @@ export default {
       }
       return obj;
     },
-    async searchAsset({toSearch, limit, offset}) {
-      try {
-        let toSend = {
-          params: {
-            serial: toSearch,
-          }
-        }
-
-        if (limit && offset) {
-          toSend.params.limit = limit;
-          toSend.params.offset = offset;
-        }
-
-        this.removeNullProps(toSend);
-        this.$axios.setToken(this.$store.state.auth.token, 'Bearer');
-        const { data, error } = await this.$axios.get('/assets/search', toSend);
-
-        this.assets = data
-      } catch (error) {
-        console.log(error);
-      }
-    },
     async addAsset() {
       try {
-        let toSend = { ...this.asset }
+        let toSend = { ...this.asset };
+        console.log(toSend)
         this.removeNullProps(toSend);
         this.$axios.setToken(this.$store.state.auth.token, 'Bearer');
         const { data, error } = await this.$axios.post('/assets', toSend);
         this.resetObject(this.Asset);
-        this.getAssets();
+        this.getAssets({});
       } catch (error) {
         console.log(error)
       }
