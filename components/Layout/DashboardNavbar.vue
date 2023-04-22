@@ -59,7 +59,7 @@
         >
           <div class="notification d-none d-lg-block d-xl-block"></div>
           <i class="tim-icons icon-sound-wave"></i>
-          <p class="d-lg-none">New Notifications</p>
+          <p class="d-lg-none">Nuevas Notificaciones</p>
         </template>
         <li class="nav-link">
           <a href="#" class="nav-item dropdown-item"
@@ -97,14 +97,14 @@
           <p class="d-lg-none">Log out</p>
         </template>
         <li class="nav-link">
-          <a href="#" class="nav-item dropdown-item">Profile</a>
+          <a href="#" class="nav-item dropdown-item">Perfil</a>
         </li>
         <li class="nav-link">
-          <a href="#" class="nav-item dropdown-item">Settings</a>
+          <a href="#" class="nav-item dropdown-item">Ver activos</a>
         </li>
         <div class="dropdown-divider"></div>
         <li class="nav-link">
-          <a href="#" class="nav-item dropdown-item">Log out</a>
+          <a href="#" @click="logOut()" class="nav-item dropdown-item">Salir</a>
         </li>
       </base-dropdown>
     </ul>
@@ -147,6 +147,16 @@ export default {
         return ''
       }
       return string.charAt(0).toUpperCase() + string.slice(1);
+    },
+    logOut(){
+      console.log("logout");
+
+      localStorage.clear();
+
+      const auth = {};
+      this.$store.commit("setAuth", auth);
+
+      window.location.href = "/login";
     },
     closeDropDown() {
       this.activeNotifications = false;
