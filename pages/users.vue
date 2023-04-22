@@ -5,11 +5,11 @@
     </div>
 
     <card class="col-md-12">
-      <base-input label="Buscar activo"></base-input>
+      <base-input label="Buscar Usuario"></base-input>
     </card>
     <!-- table -->
     <card class="col-md-9">
-      <h4 slot="header" class="card-title">Lista de activos</h4>
+      <h4 slot="header" class="card-title">Lista de usuarios</h4>
       <el-table :data="users.users" class="table-striped">
         <el-table-column
           min-width="100"
@@ -39,6 +39,16 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page.sync="currentPage4"
+        :page-sizes="[10, 20]"
+        :page-size="10"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="users.total"
+      >
+      </el-pagination>
     </card>
     <!-- buttons -->
     <div class="col-md-3">
@@ -157,21 +167,19 @@
   </div>
 </template>
 <script>
-import { BaseSwitch, Modal } from "@/components";
-import { Select, Option, Table, TableColumn } from "element-ui";
+import { BaseSwitch, Modal, BasePagination } from "@/components";
+
 export default {
   middleware: "authenticated",
   components: {
-    [Option.name]: Option,
-    [Select.name]: Select,
-    [Table.name]: Table,
-    [TableColumn.name]: TableColumn,
     BaseSwitch,
     Modal,
+    BasePagination,
   },
   data() {
     return {
-      search: '',
+      currentPage1: 1,
+      search: "",
       modals: {
         createUser: false,
       },
@@ -200,14 +208,20 @@ export default {
     this.getUsers();
   },
   methods: {
+    handleSizeChange(val) {
+      console.log(`${val} items per page`);
+    },
+    handleCurrentChange(val) {
+      console.log(`current page: ${val}`);
+    },
     updateProfile() {
       alert("Your data: " + JSON.stringify(this.user));
     },
     async getUsers() {
       try {
-        console.log(this.$store.state.auth);
         this.$axios.setToken(this.$store.state.auth.token, "Bearer");
         const { data, error } = await this.$axios.get("/users");
+        console.log(data)
         this.users = data;
       } catch (error) {
         console.log(error);
@@ -245,7 +259,10 @@ export default {
           isActive: user.isActive,
         };
         this.$axios.setToken(this.$store.state.auth.token, "Bearer");
-        const { data, error } = await this.$axios.patch(`/users/${user.id}`, toSend);
+        const { data, error } = await this.$axios.patch(
+          `/users/${user.id}`,
+          toSend
+        );
       } catch (error) {
         console.log(error);
       }
@@ -255,7 +272,10 @@ export default {
         let toSend = { ...this.user };
         this.removeNullProps(toSend);
         this.$axios.setToken(this.$store.state.auth.token, "Bearer");
-        const { data, error } = await this.$axios.patch(`/users/${this.user.id}`, toSend);
+        const { data, error } = await this.$axios.patch(
+          `/users/${this.user.id}`,
+          toSend
+        );
         this.resetObject(this.user);
         this.getUsers();
       } catch (error) {
@@ -265,4 +285,11 @@ export default {
   },
 };
 </script>
-<style></style>
+<style>
+.el-pagination .el-pager li{
+  background-color: transparent !important;
+  }
+.el-pagination .btn-next, .el-pagination .btn-prev {
+  background-color: transparent !important;
+}
+</style>

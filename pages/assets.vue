@@ -11,33 +11,82 @@
     <card class="col-md-9">
       <h4 slot="header" class="card-title">Lista de activos</h4>
       <el-table :data="assets.assets" class="table-striped">
-        <el-table-column min-width="150" sortable label="Serial" property="serial"></el-table-column>
-        <el-table-column min-width="150" sortable label="Estado" property="state.name"></el-table-column>
-        <el-table-column min-width="150" sortable label="Modelo" property="model.model"></el-table-column>
+        <el-table-column
+          min-width="150"
+          sortable
+          label="Serial"
+          property="serial"
+        ></el-table-column>
+        <el-table-column
+          min-width="150"
+          sortable
+          label="Estado"
+          property="state.name"
+        ></el-table-column>
+        <el-table-column
+          min-width="150"
+          sortable
+          label="Modelo"
+          property="model.model"
+        ></el-table-column>
       </el-table>
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page.sync="currentPage4"
+        :page-sizes="[10, 20]"
+        :page-size="10"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="assets.total"
+      >
+      </el-pagination>
     </card>
     <!-- buttons -->
     <div class="col-md-3">
       <card>
-        <base-button block type="success" class=" mb-3" @click="modals.createAsset = true">
+        <base-button
+          block
+          type="success"
+          class="mb-3"
+          @click="modals.createAsset = true"
+        >
           Crear activo
         </base-button>
       </card>
       <card>
-        <base-button block type="primary" class=" mb-3" @click="modals.createState = true">
+        <base-button
+          block
+          type="primary"
+          class="mb-3"
+          @click="modals.createState = true"
+        >
           Crear Estado
         </base-button>
-        <base-button block type="primary" class=" mb-3" @click="modals.createCategory = true">
+        <base-button
+          block
+          type="primary"
+          class="mb-3"
+          @click="modals.createCategory = true"
+        >
           Crear categoría
         </base-button>
-        <base-button block type="primary" class=" mb-3" @click="modals.createModel = true">
+        <base-button
+          block
+          type="primary"
+          class="mb-3"
+          @click="modals.createModel = true"
+        >
           Crear modelo
         </base-button>
       </card>
     </div>
     <!-- modals -->
     <div>
-      <modal :show.sync="modals.createAsset" body-classes="p-0" modal-classes="modal-dialog-centered">
+      <modal
+        :show.sync="modals.createAsset"
+        body-classes="p-0"
+        modal-classes="modal-dialog-centered"
+      >
         <card class="p-3">
           <h5 slot="header" class="title">Agregar activo</h5>
           <form @submit.prevent="addAsset">
@@ -51,9 +100,19 @@
             <div class="row">
               <div class="col-md-12">
                 <base-input type="text" label="Modelo">
-                  <el-select v-model="asset.modelId" class="select-success" placeholder="Selecciona una categoria"
-                    label="Categoria" style="width: 100%;">
-                    <el-option v-for="option in models" :key="option.id" :value="option.id" :label="option.model">
+                  <el-select
+                    v-model="asset.modelId"
+                    class="select-success"
+                    placeholder="Selecciona una categoria"
+                    label="Categoria"
+                    style="width: 100%"
+                  >
+                    <el-option
+                      v-for="option in models"
+                      :key="option.id"
+                      :value="option.id"
+                      :label="option.model"
+                    >
                     </el-option>
                   </el-select>
                 </base-input>
@@ -63,9 +122,19 @@
             <div class="row">
               <div class="col-md-12">
                 <base-input type="text" label="Estado">
-                  <el-select v-model="asset.assetStateId" class="select-success" placeholder="Selecciona un estado"
-                    label="Categoria" style="width: 100%;">
-                    <el-option v-for="option in states" :key="option.id" :value="option.id" :label="option.name">
+                  <el-select
+                    v-model="asset.assetStateId"
+                    class="select-success"
+                    placeholder="Selecciona un estado"
+                    label="Categoria"
+                    style="width: 100%"
+                  >
+                    <el-option
+                      v-for="option in states"
+                      :key="option.id"
+                      :value="option.id"
+                      :label="option.name"
+                    >
                     </el-option>
                   </el-select>
                 </base-input>
@@ -78,13 +147,21 @@
           </form>
         </card>
       </modal>
-      <modal :show.sync="modals.createState" body-classes="p-0" modal-classes="modal-dialog-centered modal-sm">
+      <modal
+        :show.sync="modals.createState"
+        body-classes="p-0"
+        modal-classes="modal-dialog-centered modal-sm"
+      >
         <card class="p-3">
           <h5 slot="header" class="title">Crear estado</h5>
           <form @submit.prevent="addState">
             <div class="row">
               <div class="col-md-12">
-                <base-input type="text" label="Nombre del estado" v-model="state.name">
+                <base-input
+                  type="text"
+                  label="Nombre del estado"
+                  v-model="state.name"
+                >
                 </base-input>
               </div>
             </div>
@@ -92,9 +169,19 @@
             <div class="row">
               <div class="col-md-12">
                 <base-input type="text" label="Modelo">
-                  <el-select v-model="state.state" class="select-success" placeholder="Selecciona una categoria"
-                    label="Categoria" style="width: 100%;">
-                    <el-option v-for="option in stateOptions" :key="option" :value="option" :label="option">
+                  <el-select
+                    v-model="state.state"
+                    class="select-success"
+                    placeholder="Selecciona una categoria"
+                    label="Categoria"
+                    style="width: 100%"
+                  >
+                    <el-option
+                      v-for="option in stateOptions"
+                      :key="option"
+                      :value="option"
+                      :label="option"
+                    >
                     </el-option>
                   </el-select>
                 </base-input>
@@ -107,13 +194,21 @@
           </form>
         </card>
       </modal>
-      <modal :show.sync="modals.createCategory" body-classes="p-0" modal-classes="modal-dialog-centered modal-sm">
+      <modal
+        :show.sync="modals.createCategory"
+        body-classes="p-0"
+        modal-classes="modal-dialog-centered modal-sm"
+      >
         <card class="p-3">
           <h5 slot="header" class="title">Crear categoria</h5>
           <form @submit.prevent="addCategory">
             <div class="row">
               <div class="col-md-12">
-                <base-input type="text" label="Nombre de la categoria" v-model="category.name">
+                <base-input
+                  type="text"
+                  label="Nombre de la categoria"
+                  v-model="category.name"
+                >
                 </base-input>
               </div>
             </div>
@@ -124,22 +219,40 @@
           </form>
         </card>
       </modal>
-      <modal :show.sync="modals.createModel" body-classes="p-0" modal-classes="modal-dialog-centered modal-sm">
+      <modal
+        :show.sync="modals.createModel"
+        body-classes="p-0"
+        modal-classes="modal-dialog-centered modal-sm"
+      >
         <card class="p-3">
           <h5 slot="header" class="title">Crear modelo</h5>
           <form @submit.prevent="addModel">
             <div class="row">
               <div class="col-md-12">
-                <base-input type="text" label="Nombre del modelo" v-model="model.model">
+                <base-input
+                  type="text"
+                  label="Nombre del modelo"
+                  v-model="model.model"
+                >
                 </base-input>
               </div>
             </div>
             <div class="row">
               <div class="col-md-12">
                 <base-input type="text" label="Modelo">
-                  <el-select v-model="model.categoryId" class="select-success" placeholder="Selecciona una categoria"
-                    label="Categoria" style="width: 100%;">
-                    <el-option v-for="option in categories" :key="option.id" :value="option.id" :label="option.name">
+                  <el-select
+                    v-model="model.categoryId"
+                    class="select-success"
+                    placeholder="Selecciona una categoria"
+                    label="Categoria"
+                    style="width: 100%"
+                  >
+                    <el-option
+                      v-for="option in categories"
+                      :key="option.id"
+                      :value="option.id"
+                      :label="option.name"
+                    >
                     </el-option>
                   </el-select>
                 </base-input>
@@ -156,7 +269,7 @@
   </div>
 </template>
 <script>
-import { BaseSwitch, Modal } from "@/components"
+import { BaseSwitch, Modal } from "@/components";
 import { Select, Option, Table, TableColumn } from "element-ui";
 
 export default {
@@ -167,125 +280,130 @@ export default {
     [Table.name]: Table,
     [TableColumn.name]: TableColumn,
     BaseSwitch,
-    Modal
+    Modal,
   },
   data() {
     return {
+      currentPage1: 1,
+      limit: 10,
+      offset: 0,
       search: "",
       modals: {
         createAsset: false,
         createState: false,
         createCategory: false,
-        createModel: false
+        createModel: false,
       },
       assets: [],
       categories: [],
       models: [],
       states: [],
-      stateOptions: ['asignado', 'desplegable', 'pendiente', 'archivado'],
+      stateOptions: ["asignado", "desplegable", "pendiente", "archivado"],
       roles: [
-        { label: 'Taquilla', value: 'taquilla' },
-        { label: 'Técnico', value: 'tecnico' },
-        { label: 'Auditor', value: 'auditor' },
-        { label: 'Superusuario', value: 'superusuario' },
+        { label: "Taquilla", value: "taquilla" },
+        { label: "Técnico", value: "tecnico" },
+        { label: "Auditor", value: "auditor" },
+        { label: "Superusuario", value: "superusuario" },
       ],
       model: {
         model: null,
-        categoryId: null
+        categoryId: null,
       },
       category: {
-        name: null
+        name: null,
       },
       state: {
         name: null,
-        state: null
+        state: null,
       },
       asset: {
         serial: null,
         modelId: null,
-        assetStateId: null
-      }
+        assetStateId: null,
+      },
     };
   },
   watch: {
     search(newState, lastState) {
-      if (newState === '') {
+      if (newState === "") {
         this.getAssets({
-          serial: newState
+          serial: newState,
         });
-        return
+        return;
       }
       if (newState.length < 3) return;
 
       this.getAssets({
-        toSearch: newState
+        toSearch: newState,
       });
-
-    }
+    },
   },
   mounted() {
     this.getAssets({}),
       this.getModels(),
       this.getStatus(),
-      this.getCategories()
+      this.getCategories();
   },
   methods: {
-    async getAssets({
-      toSearch,
-      limit,
-      offset
-    }) {
+    handleSizeChange(val) {
+      console.log(`${val} items per page`);
+      this.limit = val;
+      this.getAssets({});
+    },
+    handleCurrentChange(val) {
+      console.log(`current page: ${val}`);
+      this.offset = (val - 1) * this.limit;
+      console.log(this.offset);
+      this.getAssets({});
+    },
+    async getAssets({ toSearch }) {
       try {
         let toSend = {
-          params: {
-          }
-        }
+          params: {},
+        };
         if (toSearch) {
-          toSend.params.serial = toSearch
+          toSend.params.serial = toSearch;
         }
-
-        if (limit && offset) {
-          toSend.params.limit = limit;
-          toSend.params.offset = offset;
-        }
+        toSend.params.limit = this.limit;
+        toSend.params.offset = this.offset;
 
         this.removeNullProps(toSend);
-        this.$axios.setToken(this.$store.state.auth.token, 'Bearer')
-        const { data, error } = await this.$axios.get('/assets', toSend)
-        console.log(data)
+        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
+        const { data, error } = await this.$axios.get("/assets", toSend);
+        console.log(data);
         this.assets = data;
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     },
     async getModels() {
       try {
-        console.log(this.$store.state.auth)
-        this.$axios.setToken(this.$store.state.auth.token, 'Bearer')
-        const { data, error } = await this.$axios.get('/assets/models')
+        console.log(this.$store.state.auth);
+        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
+        const { data, error } = await this.$axios.get("/assets/models");
         this.models = data;
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     },
     async getCategories() {
       try {
-        console.log(this.$store.state.auth)
-        this.$axios.setToken(this.$store.state.auth.token, 'Bearer')
-        const { data, error } = await this.$axios.get('/assets/categories')
+        console.log(this.$store.state.auth);
+        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
+        const { data, error } = await this.$axios.get("/assets/categories");
         this.categories = data;
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     },
     async getStatus() {
       try {
-        console.log(this.$store.state.auth)
-        this.$axios.setToken(this.$store.state.auth.token, 'Bearer')
-        const { data, error } = await this.$axios.get('/assets/status')
+        console.log(this.$store.state.auth);
+        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
+        const { data, error } = await this.$axios.get("/assets/status");
         this.states = data;
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     },
     removeNullProps(obj) {
@@ -298,58 +416,66 @@ export default {
     },
     resetObject(obj) {
       for (let prop in obj) {
-        obj[prop] = null
+        obj[prop] = null;
       }
       return obj;
     },
     async addAsset() {
       try {
         let toSend = { ...this.asset };
-        console.log(toSend)
+        console.log(toSend);
         this.removeNullProps(toSend);
-        this.$axios.setToken(this.$store.state.auth.token, 'Bearer');
-        const { data, error } = await this.$axios.post('/assets', toSend);
+        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
+        const { data, error } = await this.$axios.post("/assets", toSend);
         this.resetObject(this.Asset);
         this.getAssets({});
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     },
     async addState() {
       try {
-        let toSend = { ...this.state }
-        this.$axios.setToken(this.$store.state.auth.token, 'Bearer');
-        const { data, error } = await this.$axios.post('/assets/status', toSend);
+        let toSend = { ...this.state };
+        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
+        const { data, error } = await this.$axios.post(
+          "/assets/status",
+          toSend
+        );
         this.resetObject(this.state);
         this.getStatus();
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     },
     async addCategory() {
       try {
-        let toSend = { ...this.category }
-        this.$axios.setToken(this.$store.state.auth.token, 'Bearer');
-        const { data, error } = await this.$axios.post('/assets/categories', toSend);
+        let toSend = { ...this.category };
+        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
+        const { data, error } = await this.$axios.post(
+          "/assets/categories",
+          toSend
+        );
         this.resetObject(this.category);
         this.getCategories();
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     },
     async addModel() {
       try {
-        let toSend = { ...this.model }
-        this.$axios.setToken(this.$store.state.auth.token, 'Bearer');
-        const { data, error } = await this.$axios.post('/assets/models', toSend);
+        let toSend = { ...this.model };
+        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
+        const { data, error } = await this.$axios.post(
+          "/assets/models",
+          toSend
+        );
         this.resetObject(this.model);
         this.getModels();
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     },
-
-  }
+  },
 };
 </script>
 <style>
