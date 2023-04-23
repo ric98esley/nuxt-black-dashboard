@@ -14,7 +14,7 @@
     </card>
     <div class="col-md-3">
       <card>
-        <base-button block type="success" class=" mb-3" @click="modals.createAssignment = true">
+        <base-button block type="success" class=" mb-3" @click="$nuxt.$router.push('/assignments/create');">
           Crear asignacion
         </base-button>
       </card>

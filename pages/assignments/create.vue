@@ -2,26 +2,31 @@
   <div class="row">
     <card>
       <div class="d-flex align-items-center">
-        <div class="col-md-9">
+        <div class="col-md-4">
           <label for="">Buscar activo</label>
-          <el-select
-            v-model="toSearch"
-            class="select-success"
-            placeholder="Coloca el serial de un equipo"
-            filterable
-            style="width: 100%"
-          >
-            <el-option
-              v-for="asset in assetsOnSearch.assets"
-              :key="asset.id"
-              :value="asset.serial"
-              :label="asset.serial"
-            >
+          <el-select v-model="toSearch" class="select-success" placeholder="Coloca el serial de un equipo" filterable
+            style="width: 100%">
+            <el-option v-for="asset in assetsOnSearch.assets" :key="asset.id" :value="asset.serial" :label="asset.serial">
             </el-option>
           </el-select>
         </div>
-        <div class="col-md-2">
-          <base-button type="primary">Agregar</base-button>
+        <div class="col-md-4">
+          <label for="">Tipo de asignacion</label>
+          <el-select class="select-success" placeholder="Coloca el serial de un equipo" filterable style="width: 100%">
+            <el-option key="user" value="user" label="Usuario">
+            </el-option>
+            <el-option key="location" value="location" label="Lugar">
+            </el-option>
+          </el-select>
+        </div>
+        <div class="col-md-4">
+          <base-input type="text" label="Estado">
+            <el-select v-model="assetStateId" class="select-success" placeholder="Selecciona un estado"
+              label="Estados" style="width: 100%">
+              <el-option v-for="option in states" :key="option.id" :value="option.id" :label="option.name">
+              </el-option>
+            </el-select>
+          </base-input>
         </div>
       </div>
     </card>
@@ -52,6 +57,8 @@ export default {
   },
   data() {
     return {
+      states: "",
+      assetStateId: "",
       toSearch: "",
       assets: [],
     };
@@ -75,10 +82,23 @@ export default {
       });
     },
   },
+  beforeMount () {
+    this.getStatus()
+  },
   mounted() {
     this.getAssets({})
   },
   methods: {
+    async getStatus() {
+      try {
+        console.log(this.$store.state.auth);
+        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
+        const { data, error } = await this.$axios.get("/assets/status");
+        this.states = data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
     async getAssets({ toSearch, limit, offset }) {
       try {
         let toSend = {

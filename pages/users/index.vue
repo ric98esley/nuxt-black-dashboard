@@ -29,7 +29,7 @@
           label="Correo"
           property="email"
         ></el-table-column>
-        <el-table-column min-width="100" sortable label="Es activo">
+        <el-table-column min-width="80" sortable label="Activar">
           <template slot-scope="props">
             <base-switch
               @click.native="updateUserStatus(props.row)"
@@ -37,6 +37,15 @@
               color="black"
             ></base-switch>
           </template>
+        </el-table-column>
+        <el-table-column min-width="60" header-align="right" label="Detalles">
+          <div slot-scope="{row}" class="text-right">
+            <el-tooltip content="Información" :open-delay="300" placement="top">
+              <base-button type="info" size="sm" icon>
+                <i class="fa fa-regular fa-eye"></i>
+              </base-button>
+            </el-tooltip>
+          </div>
         </el-table-column>
       </el-table>
       <el-pagination
@@ -186,8 +195,7 @@ export default {
       roles: [
         { label: "Taquilla", value: "taquilla" },
         { label: "Técnico", value: "tecnico" },
-        { label: "Auditor", value: "auditor" },
-        { label: "Superusuario", value: "superusuario" },
+        { label: "Auditor", value: "auditor" }
       ],
       users: [],
       user: {

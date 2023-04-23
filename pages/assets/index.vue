@@ -11,82 +11,47 @@
     <card class="col-md-9">
       <h4 slot="header" class="card-title">Lista de activos</h4>
       <el-table :data="assets.assets" class="table-striped">
-        <el-table-column
-          min-width="150"
-          sortable
-          label="Serial"
-          property="serial"
-        ></el-table-column>
-        <el-table-column
-          min-width="150"
-          sortable
-          label="Estado"
-          property="state.name"
-        ></el-table-column>
-        <el-table-column
-          min-width="150"
-          sortable
-          label="Modelo"
-          property="model.model"
-        ></el-table-column>
+        <el-table-column min-width="150" sortable label="Serial" property="serial"></el-table-column>
+        <el-table-column min-width="150" sortable label="Estado" property="state.name"></el-table-column>
+        <el-table-column min-width="150" sortable label="Modelo" property="model.model"></el-table-column>
+        <el-table-column min-width="100" sortable label="Tipo" property="model.category.name"></el-table-column>
+        <el-table-column min-width="80" header-align="right" label="Detalles">
+          <div slot-scope="{row}" class="text-right">
+            <el-tooltip content="Información" :open-delay="300" placement="top">
+              <base-button type="info" size="sm" icon>
+                <i class="fa fa-regular fa-eye"></i>
+              </base-button>
+            </el-tooltip>
+          </div>
+        </el-table-column>
       </el-table>
-      <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page.sync="currentPage4"
-        :page-sizes="[10, 20]"
-        :page-size="10"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="assets.total"
-      >
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+        :current-page.sync="currentPage4" :page-sizes="[10, 20]" :page-size="10"
+        layout="total, sizes, prev, pager, next, jumper" :total="assets.total">
       </el-pagination>
     </card>
     <!-- buttons -->
     <div class="col-md-3">
       <card>
-        <base-button
-          block
-          type="success"
-          class="mb-3"
-          @click="modals.createAsset = true"
-        >
+        <base-button block type="success" class="mb-3" @click="modals.createAsset = true">
           Crear activo
         </base-button>
       </card>
       <card>
-        <base-button
-          block
-          type="primary"
-          class="mb-3"
-          @click="modals.createState = true"
-        >
+        <base-button block type="primary" class="mb-3" @click="modals.createState = true">
           Crear Estado
         </base-button>
-        <base-button
-          block
-          type="primary"
-          class="mb-3"
-          @click="modals.createCategory = true"
-        >
+        <base-button block type="primary" class="mb-3" @click="modals.createCategory = true">
           Crear categoría
         </base-button>
-        <base-button
-          block
-          type="primary"
-          class="mb-3"
-          @click="modals.createModel = true"
-        >
+        <base-button block type="primary" class="mb-3" @click="modals.createModel = true">
           Crear modelo
         </base-button>
       </card>
     </div>
     <!-- modals -->
     <div>
-      <modal
-        :show.sync="modals.createAsset"
-        body-classes="p-0"
-        modal-classes="modal-dialog-centered"
-      >
+      <modal :show.sync="modals.createAsset" body-classes="p-0" modal-classes="modal-dialog-centered">
         <card class="p-3">
           <h5 slot="header" class="title">Agregar activo</h5>
           <form @submit.prevent="addAsset">
@@ -100,19 +65,9 @@
             <div class="row">
               <div class="col-md-12">
                 <base-input type="text" label="Modelo">
-                  <el-select
-                    v-model="asset.modelId"
-                    class="select-success"
-                    placeholder="Selecciona una categoria"
-                    label="Categoria"
-                    style="width: 100%"
-                  >
-                    <el-option
-                      v-for="option in models"
-                      :key="option.id"
-                      :value="option.id"
-                      :label="option.model"
-                    >
+                  <el-select v-model="asset.modelId" class="select-success" placeholder="Selecciona una categoria"
+                    label="Categoria" style="width: 100%">
+                    <el-option v-for="option in models" :key="option.id" :value="option.id" :label="option.model">
                     </el-option>
                   </el-select>
                 </base-input>
@@ -122,19 +77,9 @@
             <div class="row">
               <div class="col-md-12">
                 <base-input type="text" label="Estado">
-                  <el-select
-                    v-model="asset.assetStateId"
-                    class="select-success"
-                    placeholder="Selecciona un estado"
-                    label="Categoria"
-                    style="width: 100%"
-                  >
-                    <el-option
-                      v-for="option in states"
-                      :key="option.id"
-                      :value="option.id"
-                      :label="option.name"
-                    >
+                  <el-select v-model="asset.assetStateId" class="select-success" placeholder="Selecciona un estado"
+                    label="Categoria" style="width: 100%">
+                    <el-option v-for="option in states" :key="option.id" :value="option.id" :label="option.name">
                     </el-option>
                   </el-select>
                 </base-input>
@@ -147,21 +92,13 @@
           </form>
         </card>
       </modal>
-      <modal
-        :show.sync="modals.createState"
-        body-classes="p-0"
-        modal-classes="modal-dialog-centered modal-sm"
-      >
+      <modal :show.sync="modals.createState" body-classes="p-0" modal-classes="modal-dialog-centered modal-sm">
         <card class="p-3">
           <h5 slot="header" class="title">Crear estado</h5>
           <form @submit.prevent="addState">
             <div class="row">
               <div class="col-md-12">
-                <base-input
-                  type="text"
-                  label="Nombre del estado"
-                  v-model="state.name"
-                >
+                <base-input type="text" label="Nombre del estado" v-model="state.name">
                 </base-input>
               </div>
             </div>
@@ -169,19 +106,9 @@
             <div class="row">
               <div class="col-md-12">
                 <base-input type="text" label="Modelo">
-                  <el-select
-                    v-model="state.state"
-                    class="select-success"
-                    placeholder="Selecciona una categoria"
-                    label="Categoria"
-                    style="width: 100%"
-                  >
-                    <el-option
-                      v-for="option in stateOptions"
-                      :key="option"
-                      :value="option"
-                      :label="option"
-                    >
+                  <el-select v-model="state.state" class="select-success" placeholder="Selecciona una categoria"
+                    label="Categoria" style="width: 100%">
+                    <el-option v-for="option in stateOptions" :key="option" :value="option" :label="option">
                     </el-option>
                   </el-select>
                 </base-input>
@@ -194,21 +121,13 @@
           </form>
         </card>
       </modal>
-      <modal
-        :show.sync="modals.createCategory"
-        body-classes="p-0"
-        modal-classes="modal-dialog-centered modal-sm"
-      >
+      <modal :show.sync="modals.createCategory" body-classes="p-0" modal-classes="modal-dialog-centered modal-sm">
         <card class="p-3">
           <h5 slot="header" class="title">Crear categoria</h5>
           <form @submit.prevent="addCategory">
             <div class="row">
               <div class="col-md-12">
-                <base-input
-                  type="text"
-                  label="Nombre de la categoria"
-                  v-model="category.name"
-                >
+                <base-input type="text" label="Nombre de la categoria" v-model="category.name">
                 </base-input>
               </div>
             </div>
@@ -219,40 +138,22 @@
           </form>
         </card>
       </modal>
-      <modal
-        :show.sync="modals.createModel"
-        body-classes="p-0"
-        modal-classes="modal-dialog-centered modal-sm"
-      >
+      <modal :show.sync="modals.createModel" body-classes="p-0" modal-classes="modal-dialog-centered modal-sm">
         <card class="p-3">
           <h5 slot="header" class="title">Crear modelo</h5>
           <form @submit.prevent="addModel">
             <div class="row">
               <div class="col-md-12">
-                <base-input
-                  type="text"
-                  label="Nombre del modelo"
-                  v-model="model.model"
-                >
+                <base-input type="text" label="Nombre del modelo" v-model="model.model">
                 </base-input>
               </div>
             </div>
             <div class="row">
               <div class="col-md-12">
                 <base-input type="text" label="Modelo">
-                  <el-select
-                    v-model="model.categoryId"
-                    class="select-success"
-                    placeholder="Selecciona una categoria"
-                    label="Categoria"
-                    style="width: 100%"
-                  >
-                    <el-option
-                      v-for="option in categories"
-                      :key="option.id"
-                      :value="option.id"
-                      :label="option.name"
-                    >
+                  <el-select v-model="model.categoryId" class="select-success" placeholder="Selecciona una categoria"
+                    label="Categoria" style="width: 100%">
+                    <el-option v-for="option in categories" :key="option.id" :value="option.id" :label="option.name">
                     </el-option>
                   </el-select>
                 </base-input>
@@ -338,9 +239,11 @@ export default {
       });
     },
   },
+  beforeMount() {
+    this.getAssets({})
+  },
   mounted() {
-    this.getAssets({}),
-      this.getModels(),
+    this.getModels(),
       this.getStatus(),
       this.getCategories();
   },
