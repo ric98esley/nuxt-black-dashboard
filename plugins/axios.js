@@ -1,7 +1,8 @@
-export default function ({ $axios, redirect }) {
+export default function ({ $axios,store, redirect }) {
   $axios.onRequest(config => {
     console.log('Making request to ' + config.url)
   })
+
 
   $axios.onError(error => {
     const code = parseInt(error.response && error.response.status)
@@ -15,5 +16,13 @@ export default function ({ $axios, redirect }) {
 
       window.location.href = "/login";
     }
+  })
+
+  $axios.interceptors.request.use(config => {
+    const token = store.state.auth.token
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
   })
 }

@@ -234,13 +234,11 @@ export default {
       }
       if (newState.length < 3) return;
 
-      this.getAssets({
-        toSearch: newState,
-      });
+      this.getAssets();
     },
   },
   beforeMount() {
-    this.getAssets({})
+    this.getAssets()
   },
   mounted() {
     this.getModels(),
@@ -251,7 +249,7 @@ export default {
     handleSizeChange(val) {
       console.log(`${val} items per page`);
       this.limit = val;
-      this.getAssets({});
+      this.getAssets();
     },
     handleCurrentChange(val) {
       console.log(`current page: ${val}`);
@@ -259,13 +257,13 @@ export default {
       console.log(this.offset);
       this.getAssets({});
     },
-    async getAssets({ toSearch }) {
+    async getAssets() {
       try {
         let toSend = {
           params: {},
         };
-        if (toSearch) {
-          toSend.params.serial = toSearch;
+        if (this.search.length > 2) {
+          toSend.params.serial = this.search;
         }
         toSend.params.limit = this.limit;
         toSend.params.offset = this.offset;

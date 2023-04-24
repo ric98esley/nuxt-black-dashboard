@@ -51,7 +51,7 @@
       <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        :current-page.sync="currentPage4"
+        :current-page.sync="currentPage"
         :page-sizes="[10, 20]"
         :page-size="10"
         layout="total, sizes, prev, pager, next, jumper"
@@ -187,8 +187,10 @@ export default {
   },
   data() {
     return {
-      currentPage1: 1,
+      currentPage: 1,
       search: "",
+      limit: 10,
+      offset: 0,
       modals: {
         createUser: false,
       },
@@ -218,16 +220,21 @@ export default {
   methods: {
     handleSizeChange(val) {
       console.log(`${val} items per page`);
+      this.limit = val;
+      this.getUsers();
     },
     handleCurrentChange(val) {
       console.log(`current page: ${val}`);
+      this.offset = (val - 1) * this.limit;
+      console.log(this.offset);
+      this.getUsers();
     },
     updateProfile() {
       alert("Your data: " + JSON.stringify(this.user));
     },
     async getUsers() {
       try {
-        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
+        // this.$axios.setToken(this.$store.state.auth.token, "Bearer");
         const { data, error } = await this.$axios.get("/users");
         console.log(data)
         this.users = data;

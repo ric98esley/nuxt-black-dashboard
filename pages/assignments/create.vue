@@ -3,26 +3,26 @@
     <card>
       <div class="d-flex align-items-center">
         <div class="col-md-4">
-          <label for="">Buscar activo</label>
-          <el-select v-model="toSearch" class="select-success" placeholder="Coloca el serial de un equipo" filterable
-            style="width: 100%">
-            <el-option v-for="asset in assetsOnSearch.assets" :key="asset.id" :value="asset.serial" :label="asset.serial">
-            </el-option>
-          </el-select>
+          <base-input label="Buscar activos"></base-input>
+        </div>
+        <div class="col-md-2">
+          <base-input label="Tipo de asignacion" type="text">
+            <el-select class="select-success" filterable style="width: 100%">
+              <el-option key="user" value="user" label="Usuario">
+              </el-option>
+              <el-option key="location" value="location" label="Lugar">
+              </el-option>
+            </el-select>
+          </base-input>
         </div>
         <div class="col-md-4">
-          <label for="">Tipo de asignacion</label>
-          <el-select class="select-success" placeholder="Coloca el serial de un equipo" filterable style="width: 100%">
-            <el-option key="user" value="user" label="Usuario">
-            </el-option>
-            <el-option key="location" value="location" label="Lugar">
-            </el-option>
-          </el-select>
+          <base-input label="Asignar a" type="text">
+          </base-input>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-2">
           <base-input type="text" label="Estado">
-            <el-select v-model="assetStateId" class="select-success" placeholder="Selecciona un estado"
-              label="Estados" style="width: 100%">
+            <el-select v-model="assetStateId" class="select-success" placeholder="Selecciona un estado" label="Estados"
+              style="width: 100%">
               <el-option v-for="option in states" :key="option.id" :value="option.id" :label="option.name">
               </el-option>
             </el-select>
@@ -30,6 +30,27 @@
         </div>
       </div>
     </card>
+    <div class="col-md-6">
+
+      <card>
+        <el-table>
+          <el-table-column lable="test">
+
+          </el-table-column>
+        </el-table>
+      </card>
+    </div>
+    <div class="col-md-6">
+
+      <card>
+        <el-table>
+          <el-table-column lable="test">
+
+          </el-table-column>
+        </el-table>
+      </card>
+
+    </div>
   </div>
 </template>
 
@@ -82,7 +103,7 @@ export default {
       });
     },
   },
-  beforeMount () {
+  beforeMount() {
     this.getStatus()
   },
   mounted() {
