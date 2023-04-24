@@ -3,62 +3,70 @@
     <div class="col-md-12">
       <h1>Usuarios</h1>
     </div>
-
-    <card class="col-md-12">
-      <base-input label="Buscar Usuario"></base-input>
-    </card>
+    <div class="col-md-12">
+      <card>
+        <base-input label="Buscar Usuario"></base-input>
+      </card>
+    </div>
     <!-- table -->
-    <card class="col-md-9">
-      <h4 slot="header" class="card-title">Lista de usuarios</h4>
-      <el-table :data="users.users" class="table-striped">
-        <el-table-column
-          min-width="100"
-          sortable
-          label="User"
-          property="username"
-        ></el-table-column>
-        <el-table-column
-          min-width="100"
-          sortable
-          label="Cedula"
-          property="cardId"
-        ></el-table-column>
-        <el-table-column
-          min-width="150"
-          sortable
-          label="Correo"
-          property="email"
-        ></el-table-column>
-        <el-table-column min-width="80" sortable label="Activar">
-          <template slot-scope="props">
-            <base-switch
-              @click.native="updateUserStatus(props.row)"
-              v-model="props.row.isActive"
-              color="black"
-            ></base-switch>
-          </template>
-        </el-table-column>
-        <el-table-column min-width="60" header-align="right" label="Detalles">
-          <div slot-scope="{row}" class="text-right">
-            <el-tooltip content="Información" :open-delay="300" placement="top">
-              <base-button type="info" size="sm" icon>
-                <i class="fa fa-regular fa-eye"></i>
-              </base-button>
-            </el-tooltip>
-          </div>
-        </el-table-column>
-      </el-table>
-      <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page.sync="currentPage"
-        :page-sizes="[10, 20]"
-        :page-size="10"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="users.total"
-      >
-      </el-pagination>
-    </card>
+    <div class="col-md-9">
+      <card>
+        <h4 slot="header" class="card-title">Lista de usuarios</h4>
+        <el-table :data="users.users" class="table-striped">
+          <el-table-column
+            min-width="100"
+            sortable
+            label="User"
+            property="username"
+          ></el-table-column>
+          <el-table-column
+            min-width="100"
+            sortable
+            label="Cedula"
+            property="cardId"
+          ></el-table-column>
+          <el-table-column
+            min-width="150"
+            sortable
+            label="Correo"
+            property="email"
+          ></el-table-column>
+          <el-table-column min-width="80" sortable label="Activar">
+            <template slot-scope="props">
+              <base-switch
+                @click.native="updateUserStatus(props.row)"
+                v-model="props.row.isActive"
+                color="black"
+              ></base-switch>
+            </template>
+          </el-table-column>
+          <el-table-column min-width="60" header-align="right" label="Detalles">
+            <div slot-scope="{ row }" class="text-right">
+              <el-tooltip
+                content="Información"
+                :open-delay="300"
+                placement="top"
+              >
+                <base-button type="info" size="sm" icon>
+                  <i class="fa fa-regular fa-eye"></i>
+                </base-button>
+              </el-tooltip>
+            </div>
+          </el-table-column>
+        </el-table>
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page.sync="currentPage"
+          :page-sizes="[10, 20]"
+          :page-size="10"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="users.total"
+        >
+        </el-pagination>
+      </card>
+    </div>
+
     <!-- buttons -->
     <div class="col-md-3">
       <card>
@@ -197,7 +205,7 @@ export default {
       roles: [
         { label: "Taquilla", value: "taquilla" },
         { label: "Técnico", value: "tecnico" },
-        { label: "Auditor", value: "auditor" }
+        { label: "Auditor", value: "auditor" },
       ],
       users: [],
       user: {
@@ -234,9 +242,8 @@ export default {
     },
     async getUsers() {
       try {
-        // this.$axios.setToken(this.$store.state.auth.token, "Bearer");
         const { data, error } = await this.$axios.get("/users");
-        console.log(data)
+        console.log(data);
         this.users = data;
       } catch (error) {
         console.log(error);
@@ -260,7 +267,6 @@ export default {
       try {
         let toSend = { ...this.user };
         this.removeNullProps(toSend);
-        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
         const { data, error } = await this.$axios.post("/users", toSend);
         this.resetObject(this.user);
         this.getUsers();
@@ -273,7 +279,6 @@ export default {
         let toSend = {
           isActive: user.isActive,
         };
-        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
         const { data, error } = await this.$axios.patch(
           `/users/${user.id}`,
           toSend
@@ -286,7 +291,6 @@ export default {
       try {
         let toSend = { ...this.user };
         this.removeNullProps(toSend);
-        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
         const { data, error } = await this.$axios.patch(
           `/users/${this.user.id}`,
           toSend
@@ -301,10 +305,11 @@ export default {
 };
 </script>
 <style>
-.el-pagination .el-pager li{
+.el-pagination .el-pager li {
   background-color: transparent !important;
-  }
-.el-pagination .btn-next, .el-pagination .btn-prev {
+}
+.el-pagination .btn-next,
+.el-pagination .btn-prev {
   background-color: transparent !important;
 }
 </style>

@@ -12,10 +12,10 @@
       <h4 slot="header" class="card-title">Lista de activos</h4>
       <el-table :data="assets.assets" class="table-striped">
         <el-table-column min-width="150" sortable label="Serial" property="serial"></el-table-column>
-        <el-table-column min-width="150" sortable label="Estado" property="state.name"></el-table-column>
-        <el-table-column min-width="150" sortable label="Modelo" property="model.model"></el-table-column>
+        <el-table-column min-width="120" sortable label="Estado" property="state.name"></el-table-column>
+        <el-table-column min-width="100" sortable label="Modelo" property="model.model"></el-table-column>
         <el-table-column min-width="100" sortable label="Tipo" property="model.category.name"></el-table-column>
-        <el-table-column min-width="80" header-align="right" label="Detalles">
+        <el-table-column min-width="90" header-align="right" label="Detalles">
           <div slot-scope="{row}" class="text-right">
             <el-tooltip content="Información" :open-delay="300" placement="top">
               <base-button type="info" size="sm" icon>
@@ -269,7 +269,6 @@ export default {
         toSend.params.offset = this.offset;
 
         this.removeNullProps(toSend);
-        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
         const { data, error } = await this.$axios.get("/assets", toSend);
         console.log(data);
         this.assets = data;
@@ -280,7 +279,6 @@ export default {
     async getModels() {
       try {
         console.log(this.$store.state.auth);
-        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
         const { data, error } = await this.$axios.get("/assets/models");
         this.models = data;
       } catch (error) {
@@ -290,7 +288,6 @@ export default {
     async getCategories() {
       try {
         console.log(this.$store.state.auth);
-        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
         const { data, error } = await this.$axios.get("/assets/categories");
         this.categories = data;
       } catch (error) {
@@ -300,7 +297,6 @@ export default {
     async getStatus() {
       try {
         console.log(this.$store.state.auth);
-        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
         const { data, error } = await this.$axios.get("/assets/status");
         this.states = data;
       } catch (error) {
@@ -326,7 +322,6 @@ export default {
         let toSend = { ...this.asset };
         console.log(toSend);
         this.removeNullProps(toSend);
-        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
         const { data, error } = await this.$axios.post("/assets", toSend);
         this.resetObject(this.Asset);
         this.getAssets({});
@@ -337,7 +332,6 @@ export default {
     async addState() {
       try {
         let toSend = { ...this.state };
-        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
         const { data, error } = await this.$axios.post(
           "/assets/status",
           toSend
@@ -351,7 +345,6 @@ export default {
     async addCategory() {
       try {
         let toSend = { ...this.category };
-        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
         const { data, error } = await this.$axios.post(
           "/assets/categories",
           toSend
@@ -365,7 +358,6 @@ export default {
     async addModel() {
       try {
         let toSend = { ...this.model };
-        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
         const { data, error } = await this.$axios.post(
           "/assets/models",
           toSend
