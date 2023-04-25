@@ -1,67 +1,64 @@
 <template>
   <div class="row">
-    <card>
-      <div class="d-flex align-items-center">
-        <div class="col-md-4">
-          <base-input label="Buscar activos"></base-input>
+    <div class="col-md-12">
+      <card>
+        <div class="d-flex align-items-center">
+          <div class="col-md-4">
+            <base-input label="Buscar activos"></base-input>
+          </div>
+          <div class="col-md-2">
+            <base-input label="Tipo de asignacion" type="text">
+              <el-select class="select-success" filterable style="width: 100%">
+                <el-option key="user" value="user" label="Usuario"> </el-option>
+                <el-option key="location" value="location" label="Lugar">
+                </el-option>
+              </el-select>
+            </base-input>
+          </div>
+          <div class="col-md-4">
+            <base-input label="Asignar a" type="text"> </base-input>
+          </div>
+          <div class="col-md-2">
+            <base-input type="text" label="Estado">
+              <el-select
+                v-model="assetStateId"
+                class="select-success"
+                placeholder="Selecciona un estado"
+                label="Estados"
+                style="width: 100%"
+              >
+                <el-option
+                  v-for="option in states"
+                  :key="option.id"
+                  :value="option.id"
+                  :label="option.name"
+                >
+                </el-option>
+              </el-select>
+            </base-input>
+          </div>
         </div>
-        <div class="col-md-2">
-          <base-input label="Tipo de asignacion" type="text">
-            <el-select class="select-success" filterable style="width: 100%">
-              <el-option key="user" value="user" label="Usuario">
-              </el-option>
-              <el-option key="location" value="location" label="Lugar">
-              </el-option>
-            </el-select>
-          </base-input>
-        </div>
-        <div class="col-md-4">
-          <base-input label="Asignar a" type="text">
-          </base-input>
-        </div>
-        <div class="col-md-2">
-          <base-input type="text" label="Estado">
-            <el-select v-model="assetStateId" class="select-success" placeholder="Selecciona un estado" label="Estados"
-              style="width: 100%">
-              <el-option v-for="option in states" :key="option.id" :value="option.id" :label="option.name">
-              </el-option>
-            </el-select>
-          </base-input>
-        </div>
-      </div>
-    </card>
+      </card>
+    </div>
     <div class="col-md-6">
-
       <card>
         <el-table>
-          <el-table-column lable="test">
-
-          </el-table-column>
+          <el-table-column lable="test"> </el-table-column>
         </el-table>
       </card>
     </div>
     <div class="col-md-6">
-
       <card>
         <el-table>
-          <el-table-column lable="test">
-
-          </el-table-column>
+          <el-table-column lable="test"> </el-table-column>
         </el-table>
       </card>
-
     </div>
   </div>
 </template>
 
 <script>
-import {
-  Select,
-  Option,
-  Table,
-  TableColumn,
-  Autocomplete,
-} from "element-ui";
+import { Select, Option, Table, TableColumn, Autocomplete } from "element-ui";
 import { BaseSwitch, Modal } from "@/components";
 
 export default {
@@ -92,8 +89,7 @@ export default {
   watch: {
     toSearch(newState, lastState) {
       if (newState === "") {
-        this.getAssets({
-        });
+        this.getAssets({});
         return;
       }
       if (newState.length < 3) return;
@@ -104,10 +100,10 @@ export default {
     },
   },
   beforeMount() {
-    this.getStatus()
+    this.getStatus();
   },
   mounted() {
-    this.getAssets({})
+    this.getAssets({});
   },
   methods: {
     async getStatus() {

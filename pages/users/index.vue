@@ -5,7 +5,7 @@
     </div>
     <div class="col-md-12">
       <card>
-        <base-input label="Buscar Usuario"></base-input>
+        <base-input label="Buscar Usuario" v-model="search"></base-input>
       </card>
     </div>
     <!-- table -->
@@ -47,7 +47,7 @@
                 :open-delay="300"
                 placement="top"
               >
-                <base-button type="info" size="sm" icon>
+                <base-button type="info" size="sm" icon @click="viewUser(row)">
                   <i class="fa fa-regular fa-eye"></i>
                 </base-button>
               </el-tooltip>
@@ -222,6 +222,17 @@ export default {
       },
     };
   },
+  watch: {
+    search(newState, lastState) {
+      if (newState === "") {
+        this.getUsers();
+        return;
+      }
+      if (newState.length < 3) return;
+
+      this.getUsers();
+    },
+  },
   mounted() {
     this.getUsers();
   },
@@ -234,15 +245,19 @@ export default {
     handleCurrentChange(val) {
       console.log(`current page: ${val}`);
       this.offset = (val - 1) * this.limit;
-      console.log(this.offset);
       this.getUsers();
-    },
-    updateProfile() {
-      alert("Your data: " + JSON.stringify(this.user));
     },
     async getUsers() {
       try {
-        const { data, error } = await this.$axios.get("/users");
+        let toSend = {
+          params: {},
+        };
+        if (this.search.length > 2) {
+          toSend.params.username = this.search;
+        }
+        toSend.params.limit = this.limit;
+        toSend.params.offset = this.offset;
+        const { data, error } = await this.$axios.get("/users", toSend);
         console.log(data);
         this.users = data;
       } catch (error) {
@@ -300,6 +315,9 @@ export default {
       } catch (error) {
         console.log(error);
       }
+    },
+    viewUser(row) {
+      console.log(row);
     },
   },
 };
