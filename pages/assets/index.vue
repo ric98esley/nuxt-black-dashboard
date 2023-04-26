@@ -26,7 +26,7 @@
         </el-table-column>
       </el-table>
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-        :current-page.sync="currentPage4" :page-sizes="[10, 20]" :page-size="10"
+        :current-page.sync="currentPage" :page-sizes="[10, 20]" :page-size="10"
         layout="total, sizes, prev, pager, next, jumper" :total="assets.total">
       </el-pagination>
     </card>
@@ -185,7 +185,7 @@ export default {
   },
   data() {
     return {
-      currentPage1: 1,
+      currentPage: 1,
       limit: 10,
       offset: 0,
       search: "",
@@ -247,12 +247,10 @@ export default {
   },
   methods: {
     handleSizeChange(val) {
-      console.log(`${val} items per page`);
       this.limit = val;
       this.getAssets();
     },
     handleCurrentChange(val) {
-      console.log(`current page: ${val}`);
       this.offset = (val - 1) * this.limit;
       console.log(this.offset);
       this.getAssets({});
