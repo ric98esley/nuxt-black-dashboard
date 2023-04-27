@@ -4,11 +4,17 @@
       <card>
         <div class="d-flex align-items-center">
           <div class="col-md-4">
-            <base-input label="Buscar activos"></base-input>
+            <base-input label="Buscar activos" v-model="toSearchAssets">
+            </base-input>
           </div>
           <div class="col-md-2">
             <base-input label="Tipo de asignacion" type="text">
-              <el-select class="select-success" filterable style="width: 100%">
+              <el-select
+                class="select-success"
+                filterable
+                style="width: 100%"
+                v-model="assignmentType"
+              >
                 <el-option key="user" value="user" label="Usuario"> </el-option>
                 <el-option key="location" value="location" label="Lugar">
                 </el-option>
@@ -16,16 +22,31 @@
             </base-input>
           </div>
           <div class="col-md-4">
-            <base-input label="Asignar a" type="text"> </base-input>
+            <base-input label="Asignar a" type="text">
+              <el-autocomplete
+                v-model="targetSearch"
+                :fetch-suggestions="getUsers"
+                placeholder="Buscar usuario"
+                @select="handleSelect"
+              >
+                <template #default="{ item }">
+                  <div class="value">
+                    <b>{{ item.username }}</b
+                    >, <span class="link">{{ item.role }}</span>
+                  </div>
+                </template>
+              </el-autocomplete>
+            </base-input>
           </div>
           <div class="col-md-2">
             <base-input type="text" label="Estado">
               <el-select
-                v-model="assetStateId"
+                v-model="assetState"
                 class="select-success"
                 placeholder="Selecciona un estado"
                 label="Estados"
                 style="width: 100%"
+                name="assetState"
               >
                 <el-option
                   v-for="option in states"
@@ -40,17 +61,91 @@
         </div>
       </card>
     </div>
-    <div class="col-md-6">
+
+    <!-- tables -->
+    <div class="col-md-7">
       <card>
-        <el-table>
-          <el-table-column lable="test"> </el-table-column>
+        <el-table :data="assets.assets" class="table-striped">
+          <el-table-column
+            min-width="110"
+            sortable
+            label="Serial"
+            property="serial"
+          ></el-table-column>
+          <el-table-column
+            min-width="120"
+            sortable
+            label="Estado"
+            property="state.name"
+          ></el-table-column>
+          <el-table-column
+            min-width="100"
+            label="Modelo"
+            property="model.model"
+          ></el-table-column>
+          <el-table-column
+            min-width="100"
+            sortable
+            label="Tipo"
+            property="model.category.name"
+          ></el-table-column>
+          <el-table-column
+            min-width="100"
+            header-align="right"
+            label="Agregar"
+          >
+            <div slot-scope="{ row }" class="text-right">
+              <el-tooltip content="Agregar" :open-delay="300" placement="top">
+                <base-button
+                  type="info"
+                  size="sm"
+                  icon
+                  @click="addAssignment(row)"
+                >
+                  <i class="fa fa-regular fa-plus"></i>
+                </base-button>
+              </el-tooltip>
+            </div>
+          </el-table-column>
         </el-table>
       </card>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-5">
       <card>
-        <el-table>
-          <el-table-column lable="test"> </el-table-column>
+        <div class="row">
+          <div class="col-sm-6">
+            <span class="h-4 text-primary">Asignar a </span>
+            <b> {{ target.username }} </b>
+          </div>
+          <div class="col-sm-6 d-flex justify-content-end">
+            <span> total asignados:&nbsp; </span>
+            <b>
+              {{ assetsToAssignment.length }}
+            </b>
+          </div>
+        </div>
+        <el-table :data="assetsToAssignment" class="table-striped">
+          <el-table-column label="Serial" property="serial"> </el-table-column>
+          <el-table-column label="Tipo" property="model.category.name">
+          </el-table-column>
+          <el-table-column
+            min-width="100"
+            header-align="right"
+            label="Borrar"
+          >
+            <div slot-scope="{ row }" class="text-right">
+              <el-tooltip content="Agregar" :open-delay="300" placement="top">
+                <base-button
+                  type="danger"
+                  size="sm"
+                  icon
+                  @click="deleteAssignment(row)"
+                >
+                  <i class="fa fa-solid fa-trash"></i>
+                </base-button>
+              </el-tooltip>
+            </div>
+          </el-table-column>
         </el-table>
       </card>
     </div>
@@ -75,21 +170,21 @@ export default {
   },
   data() {
     return {
-      states: "",
-      assetStateId: "",
-      toSearch: "",
+      assetsToAssignment: [],
+      assignmentType: "",
+      targetSearch: "",
+      target: {},
+      states: {},
+      assetState: null,
+      toSearchAssets: "",
       assets: [],
+      users: [],
     };
   },
-  computed: {
-    assetsOnSearch() {
-      return this.assets;
-    },
-  },
   watch: {
-    toSearch(newState, lastState) {
+    toSearchAssets(newState, lastState) {
       if (newState === "") {
-        this.getAssets({});
+        this.getAssets();
         return;
       }
       if (newState.length < 3) return;
@@ -103,38 +198,64 @@ export default {
     this.getStatus();
   },
   mounted() {
-    this.getAssets({});
+    this.getAssets();
   },
   methods: {
+    handleSelect(item) {
+      this.target = item;
+    },
+    handleIconClick(ev) {
+      console.log(ev);
+    },
+    async getUsers(queryString, cb) {
+      try {
+        let toSend = {
+          params: {},
+        };
+
+        if (queryString.length > 2) {
+          toSend.params.username = queryString;
+        }
+
+        const { data, error } = await this.$axios.get("/users", toSend);
+        this.users = data;
+        cb(data.users);
+      } catch (error) {
+        console.log(error);
+      }
+    },
     async getStatus() {
       try {
         console.log(this.$store.state.auth);
-        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
         const { data, error } = await this.$axios.get("/assets/status");
         this.states = data;
       } catch (error) {
         console.log(error);
       }
     },
-    async getAssets({ toSearch, limit, offset }) {
+    async getAssets() {
       try {
         let toSend = {
           params: {},
         };
-        if (toSearch) {
-          toSend.params.serial = toSearch;
+        if (this.toSearchAssets.length > 3) {
+          toSend.params.serial = this.toSearchAssets;
         }
 
-        if (limit && offset) {
-          toSend.params.limit = limit;
-          toSend.params.offset = offset;
-        }
-        this.$axios.setToken(this.$store.state.auth.token, "Bearer");
         const { data, error } = await this.$axios.get("/assets", toSend);
-        console.log(data);
         this.assets = data;
       } catch (error) {
         console.log(error);
+      }
+    },
+    addAssignment(data) {
+      console.log(data);
+      this.assetsToAssignment.push(data);
+    },
+    deleteAssignment(row) {
+      const index = this.assetsToAssignment.indexOf(row);
+      if (index !== -1) {
+        this.assetsToAssignment.splice(index, 1);
       }
     },
   },
