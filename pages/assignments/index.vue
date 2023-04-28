@@ -5,11 +5,9 @@
       <base-input label="Buscar assignacion"></base-input>
     </card>
     <card class="col-md-9">
-      <el-table :data="assignments" class="table-striped">
+      <el-table :data="orders.orders" class="table-striped">
         <el-table-column label="ticket" property="id"></el-table-column>
-        <el-table-column label="serial asignado" property="asset.serial"></el-table-column>
-        <el-table-column label="Tipo de asignacion" property="assinedType"></el-table-column>
-        <el-table-column label="Asignado a" property="assinedTo"></el-table-column>
+        <el-table-column label="Tipo" property="transactionType"></el-table-column>1
       </el-table>
     </card>
     <div class="col-md-3">
@@ -42,7 +40,7 @@ export default {
       models: {
         createAssignment: false
       },
-      assignments: []
+      orders: []
     }
   },
   mounted() {
@@ -57,7 +55,9 @@ export default {
           }
         }
         const { data, error } = await this.$axios.get('/orders', toSend)
-        console.log(data);
+
+        this.orders = data
+        console.log(this.orders);
       } catch (error) {
         console.log(error)
       }
