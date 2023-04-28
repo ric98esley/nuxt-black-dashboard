@@ -19,6 +19,9 @@ export default function ({ $axios,store, redirect }) {
   })
 
   $axios.interceptors.request.use(config => {
+    if (config.url.includes('login')) {
+      return config
+    }
     const token = store.state.auth.token
     if (token) {
       config.headers.Authorization = `Bearer ${token}`

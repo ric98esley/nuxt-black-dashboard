@@ -51,8 +51,12 @@ export default {
   methods: {
     async getAssignments() {
       try {
-        this.$axios.setToken(this.$store.state.auth.token, 'Bearer')
-        const { data, error } = await this.$axios.get('/assignments/checkout/20')
+        const toSend ={
+          params: {
+
+          }
+        }
+        const { data, error } = await this.$axios.get('/orders', toSend)
         console.log(data);
       } catch (error) {
         console.log(error)
