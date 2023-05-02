@@ -239,7 +239,7 @@ export default {
         params: {},
       };
       if (this.search.length > 2) {
-        toSend.params.name = this.search;
+        toSend.params.code = this.search;
       }
       toSend.params.limit = this.limit;
       toSend.params.offset = this.offset;

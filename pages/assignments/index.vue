@@ -9,6 +9,10 @@
         <el-table-column label="ticket" property="id"></el-table-column>
         <el-table-column label="Tipo" property="transactionType"></el-table-column>1
       </el-table>
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+        :current-page.sync="currentPage" :page-sizes="[10, 20]" :page-size="10"
+        layout="total, sizes, prev, pager, next, jumper" :total="orders.total">
+      </el-pagination>
     </card>
     <div class="col-md-3">
       <card>
@@ -40,20 +44,32 @@ export default {
       models: {
         createAssignment: false
       },
-      orders: []
+      orders: [],
+      limit: 10,
+      offset: 0,
     }
   },
   mounted() {
     this.getAssignments()
   },
   methods: {
+    handleSizeChange(val) {
+      this.limit = val;
+      this.getAssignments();
+    },
+    handleCurrentChange(val) {
+      this.offset = (val - 1) * this.limit;
+      this.getAssignments();
+    },
     async getAssignments() {
       try {
-        const toSend ={
+        const toSend = {
           params: {
-
           }
         }
+
+        toSend.params.limit = this.limit;
+        toSend.params.offset = this.offset;
         const { data, error } = await this.$axios.get('/orders', toSend)
 
         this.orders = data

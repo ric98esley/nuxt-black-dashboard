@@ -238,12 +238,10 @@ export default {
   },
   methods: {
     handleSizeChange(val) {
-      console.log(`${val} items per page`);
       this.limit = val;
       this.getUsers();
     },
     handleCurrentChange(val) {
-      console.log(`current page: ${val}`);
       this.offset = (val - 1) * this.limit;
       this.getUsers();
     },
