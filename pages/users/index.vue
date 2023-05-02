@@ -155,7 +155,7 @@
               </base-input>
             </div>
             <div class="col-md-6">
-              <base-input type="text" label="Modelo">
+              <base-input type="text" label="Rol">
                 <el-select
                   v-model="user.role"
                   class="select-success"

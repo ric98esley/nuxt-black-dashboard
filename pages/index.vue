@@ -201,6 +201,7 @@ let bigChartDatasetOptions = {
 
 export default {
   name: 'dashboard',
+    middleware: 'authenticated',
   components: {
     LineChart,
     BarChart,

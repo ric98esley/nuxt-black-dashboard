@@ -22,12 +22,17 @@
         <el-table-column label="Código" property="user.username">
           <div slot-scope="{ row }">
             <p v-if="row.assignmentType === 'user'">{{ row.user.username }}</p>
-            <p v-if="row.assignmentType === 'location'">{{ row.location.code }}</p>
+            <p v-if="row.assignmentType === 'location'">
+              {{ row.location.code }}
+            </p>
           </div>
         </el-table-column>
-        <el-table-column label="Asignado por" property="createdBy.username"></el-table-column>
+        <el-table-column
+          label="Asignado por"
+          property="createdBy.username"
+        ></el-table-column>
         <el-table-column min-width="90" header-align="right" label="Detalles">
-          <div slot-scope="{row}" class="text-right">
+          <div slot-scope="{ row }" class="text-right">
             <el-tooltip content="Información" :open-delay="300" placement="top">
               <base-button type="info" size="sm" icon>
                 <i class="fa fa-regular fa-eye"></i>
@@ -36,18 +41,34 @@
           </div>
         </el-table-column>
       </el-table>
-      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-        :current-page.sync="currentPage" :page-sizes="[10, 20]" :page-size="10"
-        layout="total, sizes, prev, pager, next, jumper" :total="orders.total">
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page.sync="currentPage"
+        :page-sizes="[10, 20]"
+        :page-size="10"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="orders.total"
+      >
       </el-pagination>
     </card>
     <!-- buttons -->
     <div class="col-md-3">
       <card>
-        <base-button block type="success" class=" mb-3" @click="$nuxt.$router.push('/assignments/checkout');">
+        <base-button
+          block
+          type="success"
+          class="mb-3"
+          @click="$nuxt.$router.push('/assignments/checkout')"
+        >
           Crear asignacion
         </base-button>
-        <base-button block type="success" class=" mb-3" @click="$nuxt.$router.push('/assignments/checking');">
+        <base-button
+          block
+          type="success"
+          class="mb-3"
+          @click="$nuxt.$router.push('/assignments/checking')"
+        >
           Recibir activos
         </base-button>
       </card>
@@ -56,11 +77,11 @@
 </template>
 
 <script>
-import { BaseSwitch, Modal } from "@/components"
+import { BaseSwitch, Modal } from "@/components";
 import { Select, Option, Table, TableColumn } from "element-ui";
 
 export default {
-  middleware: 'authenticated',
+  middleware: "authenticated",
   name: "assignments",
   components: {
     [Option.name]: Option,
@@ -68,20 +89,20 @@ export default {
     [Table.name]: Table,
     [TableColumn.name]: TableColumn,
     BaseSwitch,
-    Modal
+    Modal,
   },
   data() {
     return {
       models: {
-        createAssignment: false
+        createAssignment: false,
       },
       orders: [],
       limit: 10,
       offset: 0,
-    }
+    };
   },
   mounted() {
-    this.getAssignments()
+    this.getAssignments();
   },
   methods: {
     handleSizeChange(val) {
@@ -95,20 +116,19 @@ export default {
     async getAssignments() {
       try {
         const toSend = {
-          params: {
-          }
-        }
+          params: {},
+        };
 
         toSend.params.limit = this.limit;
         toSend.params.offset = this.offset;
-        const { data, error } = await this.$axios.get('/orders', toSend)
+        const { data, error } = await this.$axios.get("/orders", toSend);
 
-        this.orders = data
+        this.orders = data;
         console.log(this.orders);
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
