@@ -1,13 +1,40 @@
 <template>
   <div class="row">
-    <h1>Asignaciones</h1>
-    <card class="col-md-12">
+    <h1 class="col-md-12">Asignaciones</h1>
+    <!-- <card class="col-md-12">
       <base-input label="Buscar assignacion"></base-input>
-    </card>
+    </card> -->
     <card class="col-md-9">
       <el-table :data="orders.orders" class="table-striped">
         <el-table-column label="ticket" property="id"></el-table-column>
-        <el-table-column label="Tipo" property="transactionType"></el-table-column>1
+        <el-table-column label="Orden de">
+          <div slot-scope="{ row }">
+            <p v-if="row.transactionType === 'checkout'">Salida</p>
+            <p v-if="row.transactionType === 'checking'">Entrada</p>
+          </div>
+        </el-table-column>
+        <el-table-column label="Asignado a" property="assignmentType">
+          <div slot-scope="{ row }">
+            <p v-if="row.assignmentType === 'user'">Usuario</p>
+            <p v-if="row.assignmentType === 'location'">Lugar</p>
+          </div>
+        </el-table-column>
+        <el-table-column label="Código" property="user.username">
+          <div slot-scope="{ row }">
+            <p v-if="row.assignmentType === 'user'">{{ row.user.username }}</p>
+            <p v-if="row.assignmentType === 'location'">{{ row.location.code }}</p>
+          </div>
+        </el-table-column>
+        <el-table-column label="Asignado por" property="createdBy.username"></el-table-column>
+        <el-table-column min-width="90" header-align="right" label="Detalles">
+          <div slot-scope="{row}" class="text-right">
+            <el-tooltip content="Información" :open-delay="300" placement="top">
+              <base-button type="info" size="sm" icon>
+                <i class="fa fa-regular fa-eye"></i>
+              </base-button>
+            </el-tooltip>
+          </div>
+        </el-table-column>
       </el-table>
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
         :current-page.sync="currentPage" :page-sizes="[10, 20]" :page-size="10"
