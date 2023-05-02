@@ -41,10 +41,14 @@
         layout="total, sizes, prev, pager, next, jumper" :total="orders.total">
       </el-pagination>
     </card>
+    <!-- buttons -->
     <div class="col-md-3">
       <card>
-        <base-button block type="success" class=" mb-3" @click="$nuxt.$router.push('/assignments/create');">
+        <base-button block type="success" class=" mb-3" @click="$nuxt.$router.push('/assignments/checkout');">
           Crear asignacion
+        </base-button>
+        <base-button block type="success" class=" mb-3" @click="$nuxt.$router.push('/assignments/checking');">
+          Recibir activos
         </base-button>
       </card>
     </div>

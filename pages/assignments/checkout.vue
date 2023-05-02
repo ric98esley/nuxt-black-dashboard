@@ -119,7 +119,7 @@ import { BaseSwitch, Modal } from "@/components";
 
 export default {
   middleware: "authenticated",
-  name: "create_assignments",
+  name: "checkout",
   components: {
     [Option.name]: Option,
     [Select.name]: Select,
