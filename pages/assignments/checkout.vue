@@ -41,7 +41,7 @@
           <div class="col-md-2">
             <base-input type="text" label="Estado">
               <el-select v-model="assetState" class="select-success" placeholder="Selecciona un estado" label="Estados"
-                style="width: 100%" name="assetState">
+                style="width: 100%" name="Estado de los activo">
                 <el-option v-for="option in states" :key="option.id" :value="option.id" :label="option.name">
                 </el-option>
               </el-select>
@@ -131,6 +131,7 @@ export default {
   },
   data() {
     return {
+      assetState: null,
       assetsToAssignment: [],
       assignmentType: "",
       targetSearch: {},
@@ -207,7 +208,6 @@ export default {
     },
     async getStatus() {
       try {
-        console.log(this.$store.state.auth);
         const { data, error } = await this.$axios.get("/assets/status");
         this.states = data;
       } catch (error) {

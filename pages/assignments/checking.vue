@@ -5,24 +5,31 @@
     </div>
     <div class="col-md-12">
       <card>
-        <base-input
-          label="Buscar Activo asignado"
-          v-model="search"
-        ></base-input>
+        <div class="d-flex justify-content-between">
+          <div class="col-md-4">
+            <base-input
+              label="Buscar Activo asignado"
+              v-model="search"
+            ></base-input>
+          </div>
+          <base-button type="primary"> Recibir </base-button>
+        </div>
       </card>
     </div>
-    <div class="col-md-6">
+    <div class="">
+      <card></card>
+    </div>
+    <div class="col-md-4">
       <card>
         <h4 slot="header" class="card-title">Lista de asignaciones activas</h4>
-        <el-table :data="assignments.assignments">
-          <el-table-column min-width="50" sortable label="id" property="id">
+        <el-table :data="assignments?.assignments">
+          <!-- fecha -->
+          <el-table-column label="Fecha" prop="checkoutAt" min-width="150">
+            <template slot-scope="scope">
+              {{ formatDate(scope.row.checkoutAt) }}
+            </template>
           </el-table-column>
-          <el-table-column min-width="150" sortable label="Tipo de asignación">
-            <div slot-scope="{ row }">
-              <p v-if="row.assignmentType === 'user'">Usuario</p>
-              <p v-if="row.assignmentType === 'location'">Lugar</p>
-            </div>
-          </el-table-column>
+
           <el-table-column
             min-width="150"
             sortable
@@ -30,20 +37,17 @@
             property="asset.serial"
           >
           </el-table-column>
-          <el-table-column label="Código" property="user.username">
-            <div slot-scope="{ row }">
-              <p v-if="row.assignmentType === 'user'">
-                {{ row.user.username }}
-              </p>
-              <p v-if="row.assignmentType === 'location'">
-                {{ row.location.code }}
-              </p>
-            </div>
-          </el-table-column>
-          <el-table-column min-width="100" header-align="right" label="Agregar">
+          <el-table-column header-align="right">
             <div slot-scope="{ row }" class="text-right">
               <el-tooltip content="Agregar" :open-delay="300" placement="top">
-                <base-button type="info" size="sm" icon native-type="button">
+                <base-button
+                  type="info"
+                  size="sm"
+                  icon
+                  native-type="button"
+                  @click="addAssignment(row)"
+                  :disabled="assetsId.includes(row.id)"
+                >
                   <i class="fa fa-regular fa-plus"></i>
                 </base-button>
               </el-tooltip>
@@ -62,11 +66,63 @@
         </el-pagination>
       </card>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-8">
       <card>
         <h4 slot="header" class="card-title">Recibir</h4>
-        <el-table>
-          <el-table-column> </el-table-column>
+        <el-table :data="assetsToChecking">
+          <el-table-column property="asset.serial" label="Serial">
+          </el-table-column>
+          <el-table-column label="Tipo">
+            <div slot-scope="{ row }">
+              {{
+                `${row.asset.model.category.name} - ${row.asset.model.model}`
+              }}
+            </div>
+          </el-table-column>
+          <el-table-column label="Procedencia">
+            <div slot-scope="{ row }">
+              <p v-if="row.assignmentType === 'user'">
+                {{ `Usuario: ${row.user.username}-` }}
+              </p>
+              <p v-if="row.assignmentType === 'location'">
+                {{ `Lugar: ${row.location.code}` }}
+              </p>
+            </div>
+          </el-table-column>
+          <el-table-column label="Estado" >
+            <base-input type="text" slot-scope="{ row }">
+              <el-select
+                v-model="row.asset.assetStateId"
+                class="select-success"
+                placeholder="Selecciona un estado"
+                label="Estados"
+                style="width: 100%"
+                name="assetState"
+              >
+                <el-option
+                  v-for="option in states"
+                  :key="option.id"
+                  :value="option.id"
+                  :label="option.name"
+                >
+                </el-option>
+              </el-select>
+            </base-input>
+          </el-table-column>
+          <el-table-column min-width="100" header-align="right">
+            <div slot-scope="{ row }" class="text-right">
+              <el-tooltip content="Agregar" :open-delay="300" placement="top">
+                <base-button
+                  type="danger"
+                  size="sm"
+                  icon
+                  @click="deleteAssignment(row)"
+                >
+                  <i class="fa fa-solid fa-trash"></i>
+                </base-button>
+              </el-tooltip>
+            </div>
+          </el-table-column>
         </el-table>
       </card>
     </div>
@@ -80,16 +136,53 @@ export default {
   name: "checking",
   data() {
     return {
+      currentPage: 1,
+      assetsToChecking: [],
+      assignmentsToSend: [],
       search: "",
       assignments: {},
       limit: 10,
-      offset: 0
+      offset: 0,
+      states: {},
+      assetState: null
     };
+  },
+  computed: {
+    assetsId() {
+      return this.assetsToChecking.map((asset) => {
+        return asset.id;
+      });
+    },
+    assetsId2() {
+      return this.assetsToChecking2.map((asset) => {
+        return asset.id;
+      });
+    },
+  },
+  beforeMount() {
+    this.getStatus();
   },
   mounted() {
     this.getAssignments();
   },
   methods: {
+    formatDate(dateString) {
+      // Crear un objeto de fecha a partir de la cadena de fecha
+
+      const fecha = new Date(dateString);
+
+      // Obtener el año, mes y día en formato de número
+      const year = fecha.getFullYear();
+      const month = fecha.getMonth() + 1;
+      const day = fecha.getDate();
+
+      // Crear un string con la fecha en formato "yyyy-mm-dd"
+      const fechaFormateada = `${year}-${month
+        .toString()
+        .padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
+
+      return fechaFormateada;
+    },
     handleSizeChange(val) {
       this.limit = val;
       this.getAssignments();
@@ -98,18 +191,46 @@ export default {
       this.offset = (val - 1) * this.limit;
       this.getAssignments();
     },
+    sendData(data) {
+      const toAdd = {
+        assignmentId: data.id,
+        assetId: data.asset.id,
+        serial: data.asset.serial,
+        assetStateId: data.asset.assetStateId
+      }
+      this.assignmentsToSend.push(toAdd);
+    },
+    addAssignment(data) {
+      if (this.assetsId.includes(data.id)) return;
+      this.assetsToChecking.push(data);
+    },
+    deleteAssignment(row) {
+      const index = this.assetsToChecking.indexOf(row);
+      if (index !== -1) {
+        this.assetsToChecking.splice(index, 1);
+      }
+    },
+    async getStatus() {
+      try {
+        const { data, error } = await this.$axios.get("/assets/status");
+        this.states = data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
     async getAssignments() {
-      const toSend = {
-        params: {},
-      };
-      const { data, error } = await this.$axios.get(
-        "/orders/assignments",
-        toSend
-      );
-
-      console.log(data);
-
-      this.assignments = data;
+      try {
+        const toSend = {
+          params: {},
+        };
+        const { data, error } = await this.$axios.get(
+          "/orders/assignments",
+          toSend
+        );
+        this.assignments = data;
+      } catch (error) {
+        console.log(error);
+      }
     },
   },
 };

@@ -99,6 +99,7 @@ export default {
       orders: [],
       limit: 10,
       offset: 0,
+      currentPage: 1
     };
   },
   mounted() {
@@ -124,7 +125,6 @@ export default {
         const { data, error } = await this.$axios.get("/orders", toSend);
 
         this.orders = data;
-        console.log(this.orders);
       } catch (error) {
         console.log(error);
       }
