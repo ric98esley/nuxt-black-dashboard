@@ -12,7 +12,13 @@
               v-model="search"
             ></base-input>
           </div>
-          <base-button type="primary"> Recibir </base-button>
+          <base-button
+            type="primary"
+            native-type="button"
+            @click="chekingAssets()"
+          >
+            Recibir
+          </base-button>
         </div>
       </card>
     </div>
@@ -89,7 +95,7 @@
               </p>
             </div>
           </el-table-column>
-          <el-table-column label="Estado" >
+          <el-table-column label="Estado">
             <base-input type="text" slot-scope="{ row }">
               <el-select
                 v-model="row.asset.assetStateId"
@@ -138,23 +144,17 @@ export default {
     return {
       currentPage: 1,
       assetsToChecking: [],
-      assignmentsToSend: [],
       search: "",
       assignments: {},
       limit: 10,
       offset: 0,
       states: {},
-      assetState: null
+      assetState: null,
     };
   },
   computed: {
     assetsId() {
       return this.assetsToChecking.map((asset) => {
-        return asset.id;
-      });
-    },
-    assetsId2() {
-      return this.assetsToChecking2.map((asset) => {
         return asset.id;
       });
     },
@@ -164,6 +164,17 @@ export default {
   },
   mounted() {
     this.getAssignments();
+  },
+  watch: {
+    search(newState, lastState) {
+      if (newState === "") {
+        this.getAssignments();
+        return;
+      }
+      if (newState.length < 3) return;
+
+      this.getAssignments();
+    },
   },
   methods: {
     formatDate(dateString) {
@@ -191,18 +202,21 @@ export default {
       this.offset = (val - 1) * this.limit;
       this.getAssignments();
     },
-    sendData(data) {
-      const toAdd = {
-        assignmentId: data.id,
-        assetId: data.asset.id,
-        serial: data.asset.serial,
-        assetStateId: data.asset.assetStateId
-      }
-      this.assignmentsToSend.push(toAdd);
+    formatData(data) {
+      const toSend = data.map((assignment) => {
+        return {
+          id: assignment.id,
+          assetStateId: assignment.asset.assetStateId,
+        };
+      });
+      return {
+        assignments: toSend,
+      };
     },
     addAssignment(data) {
       if (this.assetsId.includes(data.id)) return;
-      this.assetsToChecking.push(data);
+      const toAdd = JSON.parse(JSON.stringify(data));
+      this.assetsToChecking.push(toAdd);
     },
     deleteAssignment(row) {
       const index = this.assetsToChecking.indexOf(row);
@@ -223,11 +237,30 @@ export default {
         const toSend = {
           params: {},
         };
+        if (this.search.length > 2) {
+          toSend.params.serial = this.search;
+        }
+        toSend.params.limit = this.limit;
+        toSend.params.offset = this.offset;
+
         const { data, error } = await this.$axios.get(
           "/orders/assignments",
           toSend
         );
         this.assignments = data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async chekingAssets() {
+      try {
+        const toSend = this.formatData(this.assetsToChecking);
+
+        const checking = await this.$axios.post("/orders/checking", toSend);
+
+        this.getAssignments();
+
+        this.assetsToChecking = []
       } catch (error) {
         console.log(error);
       }

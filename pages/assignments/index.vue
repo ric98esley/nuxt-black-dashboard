@@ -72,6 +72,24 @@
           Recibir activos
         </base-button>
       </card>
+      <card>
+        <base-button
+          block
+          type="success"
+          class="mb-3"
+          @click="$nuxt.$router.push('/assignments/checking')"
+        >
+          Crear garantia
+        </base-button>
+        <base-button
+          block
+          type="success"
+          class="mb-3"
+          @click="$nuxt.$router.push('/assignments/checking')"
+        >
+          Crear venta
+        </base-button>
+      </card>
     </div>
   </div>
 </template>

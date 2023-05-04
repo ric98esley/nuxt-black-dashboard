@@ -227,9 +227,7 @@ export default {
   watch: {
     search(newState, lastState) {
       if (newState === "") {
-        this.getAssets({
-          serial: newState,
-        });
+        this.getAssets();
         return;
       }
       if (newState.length < 3) return;
