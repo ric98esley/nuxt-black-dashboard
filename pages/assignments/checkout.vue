@@ -2,37 +2,66 @@
   <div class="row">
     <div class="col-md-12">
       <card>
-        <div class="d-flex align-items-center">
+        <div class="row">
           <div class="col-md-4">
             <base-input label="Buscar activos" v-model="toSearchAssets">
             </base-input>
           </div>
           <div class="col-md-2">
             <base-input label="Tipo de asignacion" type="text">
-              <el-select class="select-success" filterable style="width: 100%" v-model="assignmentType">
+              <el-select
+                class="select-success"
+                filterable
+                style="width: 100%"
+                v-model="assignmentType"
+              >
                 <el-option key="user" value="user" label="Usuario"> </el-option>
                 <el-option key="location" value="location" label="Lugar">
+                </el-option>
+                <el-option key="Activo" value="asset" label="Activo">
                 </el-option>
               </el-select>
             </base-input>
           </div>
           <div class="col-md-2">
-            <base-input label="Asignar a" type="text" v-if="assignmentType === 'user'">
-              <el-autocomplete :trigger-on-focus="false" clearable v-model="target.name" :fetch-suggestions="getUsers"
-                placeholder="Buscar usuario" @select="handleSelect">
+            <base-input
+              label="Asignar a"
+              type="text"
+              v-if="assignmentType === 'user'"
+            >
+              <el-autocomplete
+                :trigger-on-focus="false"
+                clearable
+                v-model="target.name"
+                :fetch-suggestions="getUsers"
+                placeholder="Buscar usuario"
+                @select="handleSelect"
+              >
                 <template #default="{ item }">
                   <div class="value">
-                    <b>{{ item.username }}</b>, <span class="link">{{ item.role }}</span>
+                    <b>{{ item.username }}</b
+                    >, <span class="link">{{ item.role }}</span>
                   </div>
                 </template>
               </el-autocomplete>
             </base-input>
-            <base-input label="Asignar a" type="text" v-if="assignmentType === 'location'">
-              <el-autocomplete :trigger-on-focus="false" clearable v-model="target.name" :fetch-suggestions="getLocations"
-                placeholder="Buscar lugar" @select="handleSelect">
+            <base-input
+              label="Asignar a"
+              type="text"
+              v-if="assignmentType === 'location'"
+            >
+              <el-autocomplete
+                :trigger-on-focus="false"
+                clearable
+                v-model="target.name"
+                :fetch-suggestions="getLocations"
+                placeholder="Buscar lugar"
+                @select="handleSelect"
+              >
                 <template #default="{ item }">
                   <div class="value">
-                    <b>{{ item.name }}</b>, <span class="link">{{ item.code }}</span>
+                    <b>{{ item.name }}</b
+                    >, <span class="link">{{ item.code }}</span>
                   </div>
                 </template>
               </el-autocomplete>
@@ -40,16 +69,32 @@
           </div>
           <div class="col-md-2">
             <base-input type="text" label="Estado">
-              <el-select v-model="assetState" class="select-success" placeholder="Selecciona un estado" label="Estados"
-                style="width: 100%" name="Estado de los activo">
-                <el-option v-for="option in states" :key="option.id" :value="option.id" :label="option.name">
+              <el-select
+                v-model="assetState"
+                class="select-success"
+                placeholder="Selecciona un estado"
+                label="Estados"
+                style="width: 100%"
+                name="Estado de los activo"
+              >
+                <el-option
+                  v-for="option in states"
+                  :key="option.id"
+                  :value="option.id"
+                  :label="option.name"
+                >
                 </el-option>
               </el-select>
             </base-input>
           </div>
           <div class="col-md-2">
             <base-input label="Guardar">
-              <base-button type="primary" native-type="button" @click="createCheckout" :disabled="!(assetsId.length > 0)">
+              <base-button
+                type="primary"
+                native-type="button"
+                @click="createCheckout"
+                :disabled="!(assetsId.length > 0)"
+              >
                 Asignar
               </base-button>
             </base-input>
@@ -62,15 +107,40 @@
     <div class="col-md-7">
       <card>
         <el-table :data="assets.assets" class="table-striped">
-          <el-table-column min-width="110" sortable label="Serial" property="serial"></el-table-column>
-          <el-table-column min-width="120" sortable label="Estado" property="state.name"></el-table-column>
-          <el-table-column min-width="100" label="Modelo" property="model.model"></el-table-column>
-          <el-table-column min-width="100" sortable label="Tipo" property="model.category.name"></el-table-column>
+          <el-table-column
+            min-width="110"
+            sortable
+            label="Serial"
+            property="serial"
+          ></el-table-column>
+          <el-table-column
+            min-width="120"
+            sortable
+            label="Estado"
+            property="state.name"
+          ></el-table-column>
+          <el-table-column
+            min-width="100"
+            label="Modelo"
+            property="model.model"
+          ></el-table-column>
+          <el-table-column
+            min-width="100"
+            sortable
+            label="Tipo"
+            property="model.category.name"
+          ></el-table-column>
           <el-table-column min-width="100" header-align="right" label="Agregar">
             <div slot-scope="{ row }" class="text-right">
               <el-tooltip content="Agregar" :open-delay="300" placement="top">
-                <base-button type="info" size="sm" icon native-type="button" @click="addAssignment(row)"
-                  :disabled="assetsId.includes(row.id)">
+                <base-button
+                  type="info"
+                  size="sm"
+                  icon
+                  native-type="button"
+                  @click="addAssignment(row)"
+                  :disabled="assetsId.includes(row.id)"
+                >
                   <i class="fa fa-regular fa-plus"></i>
                 </base-button>
               </el-tooltip>
@@ -101,7 +171,12 @@
           <el-table-column min-width="100" header-align="right" label="Borrar">
             <div slot-scope="{ row }" class="text-right">
               <el-tooltip content="Agregar" :open-delay="300" placement="top">
-                <base-button type="danger" size="sm" icon @click="deleteAssignment(row)">
+                <base-button
+                  type="danger"
+                  size="sm"
+                  icon
+                  @click="deleteAssignment(row)"
+                >
                   <i class="fa fa-solid fa-trash"></i>
                 </base-button>
               </el-tooltip>
@@ -156,15 +231,15 @@ export default {
       });
     },
     assignmentType(newState, lastState) {
-      this.target = {}
-    }
+      this.target = {};
+    },
   },
   computed: {
     assetsId() {
       return this.assetsToAssignment.map((asset) => {
         return asset.id;
       });
-    }
+    },
   },
   beforeMount() {
     this.getStatus();
@@ -178,6 +253,15 @@ export default {
     },
     handleIconClick(ev) {
       console.log(ev);
+    },
+    formatData(data) {
+      const toSend = data.map((asset) => {
+        return {
+          id: asset.id,
+          assetStateId: this.assetStateId,
+        };
+      });
+      return toSend;
     },
     async getUsers(queryString, cb) {
       try {
@@ -230,7 +314,7 @@ export default {
       }
     },
     addAssignment(data) {
-      if (this.assetsId.includes(data.id)) return
+      if (this.assetsId.includes(data.id)) return;
 
       this.assetsToAssignment.push(data);
     },
@@ -241,30 +325,30 @@ export default {
       }
     },
     async createCheckout() {
-      let toSend = {
-        assetStateId: this.assetState,
-        assignments: [...this.assetsId]
-      }
+      let toSend = { };
 
-      if (this.assignmentType === 'user') {
-        toSend.userId = this.target.id
-      }
-      else if (this.assignmentType === 'location') {
-        toSend.locationId = this.target.id
+      toSend.targets = this.formatData(assetsToAssignment);
+
+      if (this.assignmentType === "user") {
+        toSend.userId = this.target.id;
+      } else if (this.assignmentType === "location") {
+        toSend.locationId = this.target.id;
+      } else if (this.assignmentType === "asset") {
+        toSend.assetId = this.target.id;
       } else {
         this.$notify({
-          message: 'Debes asignar a un lugar o persona',
+          message: "Debes asignar a un lugar, persona o activo",
           timeout: 3000,
-          icon: 'tim-icons icon-bell-55',
-        })
-        return
+          icon: "tim-icons icon-bell-55",
+        });
+        return;
       }
       try {
-        const assignment = await this.$axios.post('/orders/checkout', toSend)
+        const assignment = await this.$axios.post("/orders/checkout", toSend);
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
-    }
+    },
   },
 };
 </script>

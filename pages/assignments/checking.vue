@@ -205,12 +205,12 @@ export default {
     formatData(data) {
       const toSend = data.map((assignment) => {
         return {
-          id: assignment.id,
+          id: assignment.asset.id,
           assetStateId: assignment.asset.assetStateId,
         };
       });
       return {
-        assignments: toSend,
+        targets: toSend,
       };
     },
     addAssignment(data) {

@@ -32,11 +32,11 @@
   </div>
 </template>
 <script>
-import { createClient } from '@supabase/supabase-js'
+// import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.supabaseUrl
-const supabaseKey = process.env.supabaseKey
-const supabase = createClient(supabaseUrl, supabaseKey)
+// const supabaseUrl = process.env.supabaseUrl
+// const supabaseKey = process.env.supabaseKey
+// const supabase = createClient(supabaseUrl, supabaseKey)
 
 export default {
   middleware: 'notAuthenticated',
@@ -55,7 +55,7 @@ export default {
   methods: {
     async logon() {
       try {
-        let { data, error } = await this.$axios.post('login', {
+        let { data, error } = await this.$axios.post('/login', {
           user: this.user.email,
           password: this.user.password
         })
