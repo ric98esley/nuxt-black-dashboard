@@ -327,7 +327,7 @@ export default {
     async createCheckout() {
       let toSend = { };
 
-      toSend.targets = this.formatData(assetsToAssignment);
+      toSend.targets = this.formatData(this.assetsToAssignment);
 
       if (this.assignmentType === "user") {
         toSend.userId = this.target.id;
@@ -343,6 +343,7 @@ export default {
         });
         return;
       }
+      console.log(toSend)
       try {
         const assignment = await this.$axios.post("/orders/checkout", toSend);
       } catch (error) {
