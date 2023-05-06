@@ -212,7 +212,6 @@ export default {
       targetSearch: {},
       target: {},
       states: {},
-      assetState: null,
       toSearchAssets: "",
       assets: [],
       users: [],
@@ -258,7 +257,7 @@ export default {
       const toSend = data.map((asset) => {
         return {
           id: asset.id,
-          assetStateId: this.assetStateId,
+          assetStateId: this.assetState,
         };
       });
       return toSend;

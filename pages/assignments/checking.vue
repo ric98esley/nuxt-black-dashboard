@@ -40,7 +40,7 @@
             min-width="150"
             sortable
             label="Serial"
-            property="asset.serial"
+            property="target.serial"
           >
           </el-table-column>
           <el-table-column header-align="right">
@@ -76,12 +76,12 @@
       <card>
         <h4 slot="header" class="card-title">Recibir</h4>
         <el-table :data="assetsToChecking">
-          <el-table-column property="asset.serial" label="Serial">
+          <el-table-column property="target.serial" label="Serial">
           </el-table-column>
           <el-table-column label="Tipo">
             <div slot-scope="{ row }">
               {{
-                `${row.asset.model.category.name} - ${row.asset.model.model}`
+                `${row.target.model.category.name} - ${row.target.model.model}`
               }}
             </div>
           </el-table-column>
@@ -98,7 +98,7 @@
           <el-table-column label="Estado">
             <base-input type="text" slot-scope="{ row }">
               <el-select
-                v-model="row.asset.assetStateId"
+                v-model="row.target.assetStateId"
                 class="select-success"
                 placeholder="Selecciona un estado"
                 label="Estados"
@@ -205,8 +205,8 @@ export default {
     formatData(data) {
       const toSend = data.map((assignment) => {
         return {
-          id: assignment.asset.id,
-          assetStateId: assignment.asset.assetStateId,
+          id: assignment.target.id,
+          assetStateId: assignment.target.assetStateId,
         };
       });
       return {
