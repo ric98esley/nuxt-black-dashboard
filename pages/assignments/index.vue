@@ -31,11 +31,16 @@
           label="Asignado por"
           property="createdBy.username"
         ></el-table-column>
-        <el-table-column min-width="90" header-align="right" label="Detalles">
+        <el-table-column min-width="90" header-align="right" label="Acciones">
           <div slot-scope="{ row }" class="text-right">
             <el-tooltip content="Información" :open-delay="300" placement="top">
-              <base-button type="info" size="sm" icon @click="$nuxt.$router.push(`/assignments/${row.id}`)">
+              <base-button type="info" size="sm" icon @click="showOrder(row.id)">
                 <i class="fa fa-regular fa-eye"></i>
+              </base-button>
+            </el-tooltip>
+            <el-tooltip content="Editar" :open-delay="300" placement="top">
+              <base-button type="danger" size="sm" icon @click="$nuxt.$router.push(`/assignments/${row.id}`)">
+                <i class="fa fa-regular fa-pen"></i>
               </base-button>
             </el-tooltip>
           </div>
@@ -91,6 +96,31 @@
         </base-button>
       </card>
     </div>
+    <!-- modasl -->
+    <div>
+      <modal :show.sync="modals.viewOrder" body-classes="p-0" modal-classes="modal-dialog-centered modal-lg">
+        <card>
+          <div class="row p-3">
+            <div class="col-md-6">
+              <h2>Order</h2>
+            </div>
+            <div class="col-md-6">
+              <h4>Datos de la asignación</h4>
+              <p v-if="order.assignmentType === 'user'">Asignado A: {{ order.user.username }}</p>
+              <p v-if="order.assignmentType === 'location'">Asignado A: {{ order.location.code }}</p>
+              <p v-if="order.assignmentType === 'asset'">Asignado A: {{ order.asset.serial }}</p>
+            </div>
+          </div>
+          <div class="row p-3">
+            <el-table :data="order.assignments">
+              <el-table-column prop="id">
+
+              </el-table-column>
+            </el-table>
+          </div>
+        </card>
+      </modal>
+    </div>
   </div>
 </template>
 
@@ -111,13 +141,14 @@ export default {
   },
   data() {
     return {
-      models: {
-        createAssignment: false,
+      modals: {
+        viewOrder: false,
       },
       orders: [],
       limit: 10,
       offset: 0,
-      currentPage: 1
+      currentPage: 1,
+      order: {}
     };
   },
   mounted() {
@@ -131,6 +162,22 @@ export default {
     handleCurrentChange(val) {
       this.offset = (val - 1) * this.limit;
       this.getAssignments();
+    },
+    async getOrder(id) {
+      try {
+        const { data, error } = await this.$axios.get(`/orders/${id}`);
+        this.order = data;
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async showOrder(id) {
+      try {
+        await this.getOrder(id);
+        this.modals.viewOrder = true;
+      } catch (error) {
+        console.log(error);
+      }
     },
     async getAssignments() {
       try {

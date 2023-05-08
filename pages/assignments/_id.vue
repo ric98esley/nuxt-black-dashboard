@@ -1,12 +1,20 @@
 <template>
   <div class="row">
     <div class="col-md-12">
-        <h2>ticket {{ id }}</h2>
+      <h2>ticket {{ id }}</h2>
     </div>
     <div class="col-md-6">
-      
-      <h3>Datos</h3>
-
+      <card>
+        <h3>Agregar asignaciones</h3>
+      </card>
+    </div>
+    <div class="col-md-6">
+      <card>
+        <h3>asignaciones</h3>
+        <el-table :data="order.assignments">
+          <el-table-column prop="id"> </el-table-column>
+        </el-table>
+      </card>
     </div>
   </div>
 </template>
@@ -17,7 +25,7 @@ export default {
   data() {
     return {
       id: this.$route.params.id,
-      order: {}
+      order: {},
     };
   },
   mounted() {
@@ -28,7 +36,7 @@ export default {
       try {
         const { data } = await this.$axios.get(`/orders/${this.id}`);
 
-        this.order = data
+        this.order = data;
       } catch (error) {
         console.log(error);
       }
