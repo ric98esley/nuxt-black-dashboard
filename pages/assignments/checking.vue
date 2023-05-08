@@ -81,7 +81,7 @@
           <el-table-column label="Tipo">
             <div slot-scope="{ row }">
               {{
-                `${row.target.model.category.name} - ${row.target.model.model}`
+                `${row.target.model.category.name} - ${row.target.model.name} - ${row.target.model.brand?.name}`
               }}
             </div>
           </el-table-column>

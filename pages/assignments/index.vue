@@ -34,7 +34,7 @@
         <el-table-column min-width="90" header-align="right" label="Detalles">
           <div slot-scope="{ row }" class="text-right">
             <el-tooltip content="Información" :open-delay="300" placement="top">
-              <base-button type="info" size="sm" icon>
+              <base-button type="info" size="sm" icon @click="$nuxt.$router.push(`/assignments/${row.id}`)">
                 <i class="fa fa-regular fa-eye"></i>
               </base-button>
             </el-tooltip>

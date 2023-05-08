@@ -122,7 +122,7 @@
           <el-table-column
             min-width="100"
             label="Modelo"
-            property="model.model"
+            property="model.name"
           ></el-table-column>
           <el-table-column
             min-width="100"

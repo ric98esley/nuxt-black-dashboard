@@ -13,7 +13,7 @@
       <el-table :data="assets.assets" class="table-striped">
         <el-table-column min-width="150" sortable label="Serial" property="serial"></el-table-column>
         <el-table-column min-width="120" sortable label="Estado" property="state.name"></el-table-column>
-        <el-table-column min-width="100" sortable label="Modelo" property="model.model"></el-table-column>
+        <el-table-column min-width="100" sortable label="Modelo" property="model.name"></el-table-column>
         <el-table-column min-width="100" sortable label="Tipo" property="model.category.name"></el-table-column>
         <el-table-column min-width="90" header-align="right" label="Detalles">
           <div slot-scope="{row}" class="text-right">
@@ -49,6 +49,9 @@
         <base-button block type="primary" class="mb-3" @click="modals.createCategory = true">
           Crear categoría
         </base-button>
+        <base-button block type="primary" class="mb-3" @click="modals.createBrand = true">
+          Crear marca
+        </base-button>
         <base-button block type="primary" class="mb-3" @click="modals.createModel = true">
           Crear modelo
         </base-button>
@@ -70,9 +73,9 @@
             <div class="row">
               <div class="col-md-12">
                 <base-input type="text" label="Modelo">
-                  <el-select v-model="asset.modelId" class="select-success" placeholder="Selecciona una categoria"
+                  <el-select v-model="asset.modelId" filterable class="select-success" placeholder="Selecciona una categoria"
                     label="Categoria" style="width: 100%">
-                    <el-option v-for="option in models" :key="option.id" :value="option.id" :label="option.model">
+                    <el-option v-for="option in models" :key="option.id" :value="option.id" :label="`${option.category.name} - ${option.name} - ${option.brand?.name}`">
                     </el-option>
                   </el-select>
                 </base-input>
@@ -94,6 +97,7 @@
             <base-button native-type="submit" type="primary" class="btn-fill">
               Crear activo
             </base-button>
+            <base-button link>¿Agregar Varios?</base-button>
           </form>
         </card>
       </modal>
@@ -110,7 +114,7 @@
 
             <div class="row">
               <div class="col-md-12">
-                <base-input type="text" label="Modelo">
+                <base-input type="text" label="Estado">
                   <el-select v-model="state.state" class="select-success" placeholder="Selecciona una categoria"
                     label="Categoria" style="width: 100%">
                     <el-option v-for="option in stateOptions" :key="option" :value="option" :label="option">
@@ -149,13 +153,13 @@
           <form @submit.prevent="addModel">
             <div class="row">
               <div class="col-md-12">
-                <base-input type="text" label="Nombre del modelo" v-model="model.model">
+                <base-input type="text" label="Nombre del modelo" v-model="model.name">
                 </base-input>
               </div>
             </div>
             <div class="row">
               <div class="col-md-12">
-                <base-input type="text" label="Modelo">
+                <base-input type="text" label="Categoria">
                   <el-select v-model="model.categoryId" class="select-success" placeholder="Selecciona una categoria"
                     label="Categoria" style="width: 100%">
                     <el-option v-for="option in categories" :key="option.id" :value="option.id" :label="option.name">
@@ -164,9 +168,37 @@
                 </base-input>
               </div>
             </div>
+            <div class="row">
+              <div class="col-md-12">
+                <base-input type="text" label="Marca">
+                  <el-select v-model="model.brandId" class="select-success" placeholder="Selecciona una categoria"
+                    label="Categoria" style="width: 100%">
+                    <el-option v-for="option in brands" :key="option.id" :value="option.id" :label="option.name">
+                    </el-option>
+                  </el-select>
+                </base-input>
+              </div>
+            </div>
 
             <base-button native-type="submit" type="primary" class="btn-fill">
-              Crear categoria
+              Crear modelo
+            </base-button>
+          </form>
+        </card>
+      </modal>
+      <modal :show.sync="modals.createBrand" body-classes="p-0" modal-classes="modal-dialog-centered modal-sm">
+        <card class="p-3">
+          <h5 slot="header" class="title">Crear Marca</h5>
+          <form @submit.prevent="addBrand">
+            <div class="row">
+              <div class="col-md-12">
+                <base-input type="text" label="Nombre de la marca" v-model="brand.name">
+                </base-input>
+              </div>
+            </div>
+
+            <base-button native-type="submit" type="primary" class="btn-fill">
+              Crear marca
             </base-button>
           </form>
         </card>
@@ -199,8 +231,10 @@ export default {
         createState: false,
         createCategory: false,
         createModel: false,
+        createBrand: false,
       },
       assets: [],
+      brands: [],
       categories: [],
       models: [],
       states: [],
@@ -212,7 +246,8 @@ export default {
         { label: "Superusuario", value: "superusuario" },
       ],
       model: {
-        model: null,
+        name: null,
+        brandId: null,
         categoryId: null,
       },
       category: {
@@ -221,6 +256,9 @@ export default {
       state: {
         name: null,
         state: null,
+      },
+      brand: {
+        name: null
       },
       asset: {
         serial: null,
@@ -244,9 +282,10 @@ export default {
     this.getAssets()
   },
   mounted() {
-    this.getModels(),
-      this.getStatus(),
+    this.getModels();
+      this.getStatus();
       this.getCategories();
+      this.getBrands();
   },
   methods: {
     handleSizeChange(val) {
@@ -256,7 +295,7 @@ export default {
     handleCurrentChange(val) {
       this.offset = (val - 1) * this.limit;
       console.log(this.offset);
-      this.getAssets({});
+      this.getAssets();
     },
     async getAssets() {
       try {
@@ -271,7 +310,6 @@ export default {
 
         this.removeNullProps(toSend);
         const { data, error } = await this.$axios.get("/assets", toSend);
-        console.log(data);
         this.assets = data;
       } catch (error) {
         console.log(error);
@@ -279,7 +317,6 @@ export default {
     },
     async getModels() {
       try {
-        console.log(this.$store.state.auth);
         const { data, error } = await this.$axios.get("/assets/models");
         this.models = data;
       } catch (error) {
@@ -288,7 +325,6 @@ export default {
     },
     async getCategories() {
       try {
-        console.log(this.$store.state.auth);
         const { data, error } = await this.$axios.get("/assets/categories");
         this.categories = data;
       } catch (error) {
@@ -297,9 +333,16 @@ export default {
     },
     async getStatus() {
       try {
-        console.log(this.$store.state.auth);
         const { data, error } = await this.$axios.get("/assets/status");
         this.states = data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async getBrands() {
+      try {
+        const { data, error } = await this.$axios.get("/assets/brands")
+        this.brands = data;
       } catch (error) {
         console.log(error);
       }
@@ -339,6 +382,19 @@ export default {
         );
         this.resetObject(this.state);
         this.getStatus();
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async addBrand() {
+      try {
+        const toSend = { ...this.brand }
+        const {data, error } = await this.$axios.post(
+          "/assets/brands",
+          toSend
+        )
+        this.resetObject(this.brand);
+        this.getBrands();
       } catch (error) {
         console.log(error);
       }
