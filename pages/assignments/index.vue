@@ -174,6 +174,7 @@ export default {
     async showOrder(id) {
       try {
         await this.getOrder(id);
+        console.log(this.order)
         this.modals.viewOrder = true;
       } catch (error) {
         console.log(error);
