@@ -99,24 +99,34 @@
     <!-- modasl -->
     <div>
       <modal :show.sync="modals.viewOrder" body-classes="p-0" modal-classes="modal-dialog-centered modal-lg">
-        <card>
+        <card class="card-info">
           <div class="row p-3">
             <div class="col-md-6">
-              <h2>Order</h2>
+              
             </div>
             <div class="col-md-6">
               <h4>Datos de la asignación</h4>
-              <p v-if="order.assignmentType === 'user'">Asignado A: {{ order.user.username }}</p>
-              <p v-if="order.assignmentType === 'location'">Asignado A: {{ order.location.code }}</p>
-              <p v-if="order.assignmentType === 'asset'">Asignado A: {{ order.asset.serial }}</p>
+              <template v-if="order.assignmentType === 'user'">Asignado A: {{ order.user.name }} {{ order.user.lastName}}</template>
+              <template v-if="order.assignmentType === 'location'">Asignado A: {{ order.location.name }} - {{ order.location.code }}</template>
+              <template v-if="order.assignmentType === 'asset'">Asignado A: {{ order.asset.serial }}</template>
+
             </div>
           </div>
           <div class="row p-3">
-            <el-table :data="order.assignments">
-              <el-table-column prop="id">
-
+            <el-table :data="order.assignments" :row-class-name="row => row.isCurrent ? '' : 'text-decoration-line-through'">
+              <el-table-column prop="target.serial" label="serial">
+              </el-table-column>
+              <el-table-column prop="" label="Descripción">
+                <template slot-scope="{ row }" >
+                  <div >
+                  {{ row.target.model.category.name }} - {{ row.target.model?.brand?.name }} - {{ row.target.model.name}}
+                  </div>
+                </template>
               </el-table-column>
             </el-table>
+          </div>
+          <div class="p-3">
+            <base-button link>Imprimir</base-button>
           </div>
         </card>
       </modal>

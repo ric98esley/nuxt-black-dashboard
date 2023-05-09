@@ -94,6 +94,7 @@
               </div>
             </div>
 
+
             <base-button native-type="submit" type="primary" class="btn-fill">
               Crear activo
             </base-button>
@@ -428,9 +429,3 @@ export default {
   },
 };
 </script>
-<style>
-.table-transparent {
-  background-color: transparent !important;
-}
-</style>
-  

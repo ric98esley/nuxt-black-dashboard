@@ -106,7 +106,22 @@
                 </base-input>
               </div>
               <div class="col-md-4">
-                <base-input v-model="location.managerId" label="A cargo de">
+                <base-input label="A cargo de" type="text">
+                  <el-autocomplete
+                    :trigger-on-focus="false"
+                    clearable
+                    v-model="manager.name"
+                    :fetch-suggestions="getUsers"
+                    placeholder="Buscar usuario"
+                    @select="handleSelect"
+                  >
+                    <template #default="{ item }">
+                      <div class="value">
+                        <b>{{ item.username }}</b
+                        >, <span class="link">{{ item.role }}</span>
+                      </div>
+                    </template>
+                  </el-autocomplete>
                 </base-input>
               </div>
               <div class="col-md-4">
@@ -157,13 +172,19 @@
 </template>
 <script>
 import { BaseSwitch, Modal, BasePagination } from "@/components";
+import { Select, Option, Table, TableColumn, Autocomplete } from "element-ui";
 
 export default {
   middleware: "authenticated",
   components: {
+    [Option.name]: Option,
+    [Select.name]: Select,
+    [Table.name]: Table,
+    [TableColumn.name]: TableColumn,
+    [Autocomplete.name]: Autocomplete,
+    BasePagination,
     BaseSwitch,
     Modal,
-    BasePagination,
   },
   data() {
     return {
@@ -176,6 +197,10 @@ export default {
       modals: {
         createLocation: false,
         createZone: false,
+      },
+      manager: {},
+      parentLocation: {
+
       },
       zone: {
         zoneName: null,
@@ -201,6 +226,9 @@ export default {
 
       this.getLocations();
     },
+    manager(newState, lastState) {
+      this.location.managerId = newState.id
+    }
   },
   beforeMount() {
     this.getLocations();
@@ -210,14 +238,11 @@ export default {
   },
   methods: {
     handleSizeChange(val) {
-      console.log(`${val} items per page`);
       this.limit = val;
       this.getUsers();
     },
     handleCurrentChange(val) {
-      console.log(`current page: ${val}`);
       this.offset = (val - 1) * this.limit;
-      console.log(this.offset);
       this.getUsers();
     },
     removeNullProps(obj) {
@@ -233,6 +258,9 @@ export default {
         obj[prop] = null;
       }
       return obj;
+    },
+    handleSelect(item) {
+      this.manager = item;
     },
     async getLocations() {
       const toSend = {
@@ -252,6 +280,11 @@ export default {
     async addLocation() {
       try {
         let toSend = { ...this.location };
+        const managerId = toSend.manager.id;
+        toSend = {
+          ...toSend,
+          managerId,
+        };
         this.removeNullProps(toSend);
         const { data, error } = await this.$axios.post("/locations", toSend);
         this.resetObject(this.location);
@@ -272,6 +305,22 @@ export default {
         this.resetObject(this.zone);
         this.getZones();
         console.log(data);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async getUsers(queryString, cb) {
+      try {
+        let toSend = {
+          params: {},
+        };
+
+        if (queryString.length > 2) {
+          toSend.params.username = queryString;
+        }
+
+        const { data, error } = await this.$axios.get("/users", toSend);
+        cb(data.users);
       } catch (error) {
         console.log(error);
       }

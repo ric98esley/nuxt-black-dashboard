@@ -83,6 +83,12 @@ export default {
           return;
         }
       } catch (error) {
+        this.$notify({
+            type: "danger",
+            icon: "tim-icons icon-check-2",
+            message: "Usuario o contraseña incorrectos",
+            timeout: 60000
+          });
         console.log(error)
       }
     }
