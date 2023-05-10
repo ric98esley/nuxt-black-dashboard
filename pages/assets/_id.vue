@@ -69,9 +69,18 @@
 </template>
 
 <script>
+import { Select, Option, Table, TableColumn, Pagination } from "element-ui";
+
 export default {
   name: "AssetDetails",
   middleware: "authenticated",
+  components: {
+    [Option.name]: Option,
+    [Select.name]: Select,
+    [Table.name]: Table,
+    [TableColumn.name]: TableColumn,
+    [Pagination.name]: Pagination
+  },
   data() {
     return {
       asset: {},

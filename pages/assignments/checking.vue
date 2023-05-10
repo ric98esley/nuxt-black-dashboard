@@ -137,9 +137,18 @@
 
 
 <script>
+import { Select, Option, Table, TableColumn, Pagination } from "element-ui";
+
 export default {
   middleware: "authenticated",
   name: "checking",
+  components: {
+    [Option.name]: Option,
+    [Select.name]: Select,
+    [Table.name]: Table,
+    [TableColumn.name]: TableColumn,
+    [Pagination.name]: Pagination
+  },
   data() {
     return {
       currentPage: 1,
@@ -258,10 +267,20 @@ export default {
 
         const checking = await this.$axios.post("/orders/checking", toSend);
 
+        this.$notify({
+          message: "Activos recibidos correctamente",
+          timeout: 3000,
+          icon: "tim-icons icon-bell-55",
+        });
         this.getAssignments();
 
-        this.assetsToChecking = []
+        this.assetsToChecking = [];
       } catch (error) {
+        this.$notify({
+          message: "Algo ocurrio mal, verifica los activos recibidos",
+          timeout: 3000,
+          icon: "tim-icons icon-bell-55",
+        });
         console.log(error);
       }
     },

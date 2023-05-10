@@ -209,7 +209,7 @@
 </template>
 <script>
 import { BaseSwitch, Modal } from "@/components";
-import { Select, Option, Table, TableColumn } from "element-ui";
+import { Select, Option, Table, TableColumn, Pagination } from "element-ui";
 
 export default {
   middleware: "authenticated",
@@ -218,6 +218,7 @@ export default {
     [Select.name]: Select,
     [Table.name]: Table,
     [TableColumn.name]: TableColumn,
+    [Pagination.name]: Pagination,
     BaseSwitch,
     Modal,
   },

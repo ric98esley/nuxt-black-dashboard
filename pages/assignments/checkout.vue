@@ -345,7 +345,17 @@ export default {
       console.log(toSend)
       try {
         const assignment = await this.$axios.post("/orders/checkout", toSend);
+        this.$notify({
+          message: "Activos asignado correctamente",
+          timeout: 3000,
+          icon: "tim-icons icon-bell-55",
+        });
       } catch (error) {
+        this.$notify({
+          message: "Algo ocurrio mal",
+          timeout: 3000,
+          icon: "tim-icons icon-bell-55",
+        });
         console.log(error);
       }
     },

@@ -113,7 +113,7 @@
             </div>
           </div>
           <div class="row p-3">
-            <el-table :data="order.assignments" :row-class-name="row => row.isCurrent ? '' : 'text-decoration-line-through'">
+            <el-table :data="order.assignments" :row-class-name="({row}) => row.isCurrent ? '' : 'text-decoration-line-through'">
               <el-table-column prop="target.serial" label="serial">
               </el-table-column>
               <el-table-column prop="" label="Descripción">
@@ -136,7 +136,7 @@
 
 <script>
 import { BaseSwitch, Modal } from "@/components";
-import { Select, Option, Table, TableColumn } from "element-ui";
+import { Select, Option, Table, TableColumn, Pagination } from "element-ui";
 
 export default {
   middleware: "authenticated",
@@ -146,6 +146,7 @@ export default {
     [Select.name]: Select,
     [Table.name]: Table,
     [TableColumn.name]: TableColumn,
+    [Pagination.name]: Pagination,
     BaseSwitch,
     Modal,
   },
@@ -208,3 +209,9 @@ export default {
   },
 };
 </script>
+
+<style>
+.text-decoration-line-through {
+  text-decoration: line-through
+}
+</style>

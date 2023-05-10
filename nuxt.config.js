@@ -58,15 +58,13 @@ export default {
     'assets/css/demo.css',
     'assets/css/nucleo-icons.css',
     'assets/sass/black-dashboard.scss',
-    'element-ui/lib/theme-chalk/index.css'
   ],
   /*
    ** Plugins to load before mounting the App
    */
   plugins: [
     `~/plugins/dashboard-plugin.js`,
-    `~/plugins/axios`,
-    `~/plugins/element-ui`,
+    `~/plugins/axios`
   ],
   /*
    ** Nuxt.js dev-modules

@@ -185,6 +185,7 @@
 </template>
 <script>
 import { BaseSwitch, Modal, BasePagination } from "@/components";
+import { Select, Option, Table, TableColumn, Pagination } from "element-ui";
 
 export default {
   middleware: "authenticated",
@@ -192,6 +193,11 @@ export default {
     BaseSwitch,
     Modal,
     BasePagination,
+    [Option.name]: Option,
+    [Select.name]: Select,
+    [Table.name]: Table,
+    [TableColumn.name]: TableColumn,
+    [Pagination.name]: Pagination,
   },
   data() {
     return {
