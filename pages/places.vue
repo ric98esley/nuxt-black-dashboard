@@ -82,6 +82,7 @@
                     class="select-success"
                     placeholder="Selecciona una zona"
                     style="width: 100%"
+                    filterable
                   >
                     <el-option
                       v-for="option in zones"
@@ -98,14 +99,14 @@
               <div class="col-md-4">
                 <base-input type="text" label="Padre">
                   <el-select
-                    v-model="location.locationParent"
+                    v-model="location.parentId"
                     class="select-success"
                     placeholder="Selecciona un padre"
                   >
                   </el-select>
                 </base-input>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <base-input label="A cargo de" type="text">
                   <el-autocomplete
                     :trigger-on-focus="false"
@@ -192,6 +193,7 @@ export default {
       search: "",
       limit: 10,
       offset: 0,
+      locationTypes: [],
       locations: [],
       zones: [],
       modals: {
@@ -209,7 +211,8 @@ export default {
         name: null,
         type: null,
         code: null,
-        locationParent: null,
+        parentId: null,
+        groupId: null,
         address: null,
         managerId: null,
         zoneId: null,
@@ -231,6 +234,7 @@ export default {
     }
   },
   beforeMount() {
+    this.getLocationType();
     this.getLocations();
   },
   mounted() {
@@ -261,6 +265,14 @@ export default {
     },
     handleSelect(item) {
       this.manager = item;
+    },
+    async getLocationType() {
+      try {
+        const { data, error } = await this.$axios.get("/locations/types")
+        console.log(data)
+      } catch (error) {
+        
+      }
     },
     async getLocations() {
       const toSend = {
