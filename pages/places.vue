@@ -67,15 +67,15 @@
           <h5 slot="header" class="title">Crear localización</h5>
           <form @submit.prevent="addLocation">
             <div class="row">
-              <div class="col-md-4">
+              <div class="col-lg-4">
                 <base-input type="text" label="Nombre" v-model="location.name">
                 </base-input>
               </div>
-              <div class="col-md-4">
+              <div class="col-lg-4">
                 <base-input type="text" label="Codigo" v-model="location.code">
                 </base-input>
               </div>
-              <div class="col-md-4">
+              <div class="col-lg-4">
                 <base-input type="text" label="Zona">
                   <el-select
                     v-model="location.zoneId"
@@ -96,25 +96,54 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-md-4">
+              <div class="col-lg-4">
                 <base-input type="text" label="Padre">
-                  <el-select
-                    v-model="location.parentId"
-                    class="select-success"
-                    placeholder="Selecciona un padre"
+                  <el-autocomplete
+                    class="w-100"
+                    :trigger-on-focus="false"
+                    clearable
+                    v-model="parent.code"
+                    :fetch-suggestions="getParent"
+                    placeholder="Buscar lugar"
+                    @select="handleSelectParent"
                   >
+                    <template #default="{ item }">
+                      <div class="value">
+                        <b>{{ item.name }}</b
+                        >,
+                        <span class="link">{{ item.code }}</span>
+                      </div>
+                    </template>
+                  </el-autocomplete>
+                </base-input>
+              </div>
+              <div class="col-lg-4">
+                <base-input type="text" label="Tipo">
+                  <el-select
+                    v-model="location.typeId"
+                    class="select-success"
+                    placeholder="Selecciona un tipo"
+                  >
+                    <el-option
+                      v-for="option in locationTypes.types"
+                      :key="option.id"
+                      :value="option.id"
+                      :label="option.name"
+                    >
+                    </el-option>
                   </el-select>
                 </base-input>
               </div>
-              <div class="col-md-6">
+              <div class="col-lg-4">
                 <base-input label="A cargo de" type="text">
                   <el-autocomplete
+                    class="w-100"
                     :trigger-on-focus="false"
                     clearable
                     v-model="manager.name"
                     :fetch-suggestions="getUsers"
                     placeholder="Buscar usuario"
-                    @select="handleSelect"
+                    @select="handleSelectManager"
                   >
                     <template #default="{ item }">
                       <div class="value">
@@ -125,13 +154,37 @@
                   </el-autocomplete>
                 </base-input>
               </div>
-              <div class="col-md-4">
-                <base-input v-model="location.type" label="Tipo de lugar">
+              <div class="col-lg-12">
+                <base-input label="Grupo">
+                  <el-autocomplete
+                    class="w-100"
+                    :trigger-on-focus="false"
+                    clearable
+                    v-model="group.name"
+                    :fetch-suggestions="getGroups"
+                    placeholder="Buscar grupos"
+                    @select="handleSelectGroup"
+                  >
+                    <template #default="{ item }">
+                      <div class="value">
+                        <b>{{ item.code }}</b
+                        >, <span class="link">{{ item.name }}</span>
+                      </div>
+                    </template>
+                  </el-autocomplete>
                 </base-input>
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
+              <div class="col-lg-6">
+                <base-input label="Telefono del local"></base-input>
+              </div>
+              <div class="col-lg-6">
+                <base-input label="Rif del local"></base-input>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-12">
                 <base-input
                   v-model="location.address"
                   class="select-success"
@@ -148,6 +201,7 @@
           </form>
         </card>
       </modal>
+      <!-- ZONA -->
       <modal
         :show.sync="modals.createZone"
         modal-classes="modal-dialog-centered modal-sm"
@@ -193,29 +247,31 @@ export default {
       search: "",
       limit: 10,
       offset: 0,
-      locationTypes: [],
-      locations: [],
+      locationTypes: {},
+      locations: {},
+      groups: {},
       zones: [],
       modals: {
         createLocation: false,
         createZone: false,
       },
       manager: {},
-      parentLocation: {
-
-      },
+      parent: {},
+      group: {},
       zone: {
         zoneName: null,
       },
       location: {
-        name: null,
-        type: null,
         code: null,
-        parentId: null,
+        name: null,
+        typeId: null,
         groupId: null,
-        address: null,
+        phone: null,
+        rif: null,
+        parentId: null,
         managerId: null,
         zoneId: null,
+        address: null,
       },
     };
   },
@@ -230,8 +286,14 @@ export default {
       this.getLocations();
     },
     manager(newState, lastState) {
-      this.location.managerId = newState.id
-    }
+      this.location.managerId = newState.id;
+    },
+    parent(newState, lastState) {
+      this.location.parentId = newState.id;
+    },
+    group(newState, lastState) {
+      this.location.groupId = newState.id;
+    },
   },
   beforeMount() {
     this.getLocationType();
@@ -241,6 +303,18 @@ export default {
     this.getZones();
   },
   methods: {
+    handleSelectParent(item) {
+      this.parent = item;
+    },
+    handleSelectManager(item) {
+      this.manager = item;
+    },
+    handleSelectGroup(item) {
+      this.group = item;
+    },
+    handleIconClick(ev) {
+      console.log(ev);
+    },
     handleSizeChange(val) {
       this.limit = val;
       this.getUsers();
@@ -268,26 +342,22 @@ export default {
     },
     async getLocationType() {
       try {
-        const { data, error } = await this.$axios.get("/locations/types")
-        console.log(data)
+        const { data, error } = await this.$axios.get("/locations/types");
+        this.locationTypes = data;
       } catch (error) {
-        
+        console.log(error);
       }
     },
-    async getLocations() {
+    async getParent(queryString, cb) {
       const toSend = {
         params: {},
       };
-      if (this.search.length > 2) {
-        toSend.params.code = this.search;
+      if (queryString.length > 2) {
+        toSend.params.code = queryString;
       }
-      toSend.params.limit = this.limit;
-      toSend.params.offset = this.offset;
 
       const { data, error } = await this.$axios.get("/locations", toSend);
-
-      this.locations = data;
-      console.log(this.locations);
+      cb(data.locations);
     },
     async addLocation() {
       try {
@@ -320,6 +390,31 @@ export default {
       } catch (error) {
         console.log(error);
       }
+    },
+    async getLocations() {
+      const toSend = {
+        params: {},
+      };
+      if (this.search.length > 2) {
+        toSend.params.code = this.search;
+      }
+      toSend.params.limit = this.limit;
+      toSend.params.offset = this.offset;
+      const { data, error } = await this.$axios.get("/locations", toSend);
+      this.locations = data;
+    },
+    async getGroups(queryString, cb) {
+      const toSend = {
+        params: {},
+      };
+      if (queryString.length > 2) {
+        toSend.params.code = queryString;
+      }
+      const { data, error } = await this.$axios.get(
+        "/groups",
+        toSend
+      );
+      cb(data.groups);
     },
     async getUsers(queryString, cb) {
       try {
