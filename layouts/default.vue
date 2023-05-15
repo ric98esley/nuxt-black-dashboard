@@ -55,6 +55,14 @@
           }"
         >
         </sidebar-item>
+        <sidebar-item
+          :link="{
+            name: 'Grupos',
+            icon: 'tim-icons icon-vector  ',
+            path: '/groups'
+          }"
+        >
+        </sidebar-item>
 
       </template>
     </side-bar>

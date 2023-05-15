@@ -167,7 +167,7 @@
                   >
                     <template #default="{ item }">
                       <div class="value">
-                        <b>{{ item.code }}</b
+                        <b>{{ item.code }}</b 
                         >, <span class="link">{{ item.name }}</span>
                       </div>
                     </template>
@@ -177,10 +177,10 @@
             </div>
             <div class="row">
               <div class="col-lg-6">
-                <base-input label="Telefono del local"></base-input>
+                <base-input label="Telefono del local" v-model="location.phone"></base-input>
               </div>
               <div class="col-lg-6">
-                <base-input label="Rif del local"></base-input>
+                <base-input label="Rif del local" v-model="location.rif"></base-input>
               </div>
             </div>
             <div class="row">
@@ -362,15 +362,15 @@ export default {
     async addLocation() {
       try {
         let toSend = { ...this.location };
-        const managerId = toSend.manager.id;
-        toSend = {
-          ...toSend,
-          managerId,
-        };
-        this.removeNullProps(toSend);
         const { data, error } = await this.$axios.post("/locations", toSend);
         this.resetObject(this.location);
         this.getLocations();
+        this.$notify({
+          message: `Agencia creada correctamente:
+          ${data.name} - ${data.code}
+          `,
+          type: 'success'
+        })
         console.log(data);
       } catch (error) {
         console.log(error);
@@ -386,7 +386,10 @@ export default {
         );
         this.resetObject(this.zone);
         this.getZones();
-        console.log(data);
+        this.$notify({
+          message: `Zona creada: ${data.zoneName}`,
+          type: 'success'
+        })
       } catch (error) {
         console.log(error);
       }

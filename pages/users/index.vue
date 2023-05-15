@@ -288,6 +288,10 @@ export default {
         this.removeNullProps(toSend);
         const { data, error } = await this.$axios.post("/users", toSend);
         this.resetObject(this.user);
+        this.$notify({
+          message: `Usuario creado correctamente,
+          ${data.username}`
+        })
         this.getUsers();
       } catch (error) {
         console.log(error);
