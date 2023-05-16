@@ -13,6 +13,7 @@
         </div>
       </card>
     </div>
+    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeX9u0fxIp_Lm8B9rvEd49skT35P5WwE0k6E1hdEF-Jtat5_A/viewform?embedded=true" width="640" height="720" frameborder="0" marginheight="0" marginwidth="0">Cargando…</iframe>
   </div>
 </template>
 <script>

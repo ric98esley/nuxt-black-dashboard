@@ -105,7 +105,7 @@
       toggleMode(type) {
         let docClasses = document.body.classList;
         if (type) {
-          docClasses.remove('white-content');
+          docClasses.add('white-content');
         } else {
           docClasses.add('white-content');
         }

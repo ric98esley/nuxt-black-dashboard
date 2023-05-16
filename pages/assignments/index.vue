@@ -34,12 +34,22 @@
         <el-table-column min-width="90" header-align="right" label="Acciones">
           <div slot-scope="{ row }" class="text-right">
             <el-tooltip content="Información" :open-delay="300" placement="top">
-              <base-button type="info" size="sm" icon @click="showOrder(row.id)">
+              <base-button
+                type="info"
+                size="sm"
+                icon
+                @click="showOrder(row.id)"
+              >
                 <i class="fa fa-regular fa-eye"></i>
               </base-button>
             </el-tooltip>
             <el-tooltip content="Editar" :open-delay="300" placement="top">
-              <base-button type="danger" size="sm" icon @click="$nuxt.$router.push(`/assignments/${row.id}`)">
+              <base-button
+                type="danger"
+                size="sm"
+                icon
+                @click="$nuxt.$router.push(`/assignments/${row.id}`)"
+              >
                 <i class="fa fa-regular fa-pen"></i>
               </base-button>
             </el-tooltip>
@@ -98,35 +108,69 @@
     </div>
     <!-- modasl -->
     <div>
-      <modal :show.sync="modals.viewOrder" body-classes="p-0" modal-classes="modal-dialog-centered modal-lg">
+      <modal
+        :show.sync="modals.viewOrder"
+        body-classes="p-0"
+        modal-classes="modal-dialog-centered modal-lg"
+      >
         <card class="card-info">
           <div class="row p-3">
             <div class="col-md-6">
-              
+              <h4>Gana Loterias</h4>
+              <div>Lo tenemos todo</div>
+              <div>RIF: 123542673586736235</div>
+              <div>Telefono: 027631234114</div>
             </div>
             <div class="col-md-6">
               <h4>Datos de la asignación</h4>
-              <template v-if="order.assignmentType === 'user'">Asignado A: {{ order.user.name }} {{ order.user.lastName}}</template>
-              <template v-if="order.assignmentType === 'location'">Asignado A: {{ order.location.name }} - {{ order.location.code }}</template>
-              <template v-if="order.assignmentType === 'asset'">Asignado A: {{ order.asset.serial }}</template>
-
+              <template v-if="order.assignmentType === 'user'">
+                Asignado A: {{ order.user.name }} {{ order.user.lastName }}
+              </template>
+              <template v-if="order.assignmentType === 'location'"
+                >Asignado A: {{ order.location.name }} -
+                {{ order.location.code }}</template
+              >
+              <template v-if="order.assignmentType === 'asset'"
+                >Asignado A: {{ order.asset.serial }}</template
+              >
+              <div>
+                Asignado por: {{ order.createdBy?.name }}
+                {{ order.createdBy?.lastName }}
+              </div>
+              <div>Asignado el: {{ formatDate(order.createdAt) }}</div>
             </div>
           </div>
           <div class="row p-3">
-            <el-table :data="order.assignments" :row-class-name="({row}) => row.isCurrent ? '' : 'text-decoration-line-through'">
+            <el-table
+              :data="order.assignments"
+              :row-class-name="
+                ({ row }) =>
+                  row.isCurrent ? '' : 'text-decoration-line-through'
+              "
+            >
               <el-table-column prop="target.serial" label="serial">
               </el-table-column>
               <el-table-column prop="" label="Descripción">
-                <template slot-scope="{ row }" >
-                  <div >
-                  {{ row.target.model.category.name }} - {{ row.target.model?.brand?.name }} - {{ row.target.model.name}}
+                <template slot-scope="{ row }">
+                  <div>
+                    {{ row.target.model.category.name }} -
+                    {{ row.target.model?.brand?.name }} -
+                    {{ row.target.model.name }}
                   </div>
                 </template>
               </el-table-column>
             </el-table>
           </div>
           <div class="p-3">
-            <base-button link>Imprimir</base-button>
+            <base-button link>
+              <router-link
+                :to="{path:`/assignments/print/${order.id}`}"
+                target="_blank"
+
+              >
+                Imprimir</router-link
+              >
+            </base-button>
           </div>
         </card>
       </modal>
@@ -159,7 +203,7 @@ export default {
       limit: 10,
       offset: 0,
       currentPage: 1,
-      order: {}
+      order: {},
     };
   },
   mounted() {
@@ -174,18 +218,35 @@ export default {
       this.offset = (val - 1) * this.limit;
       this.getAssignments();
     },
+    formatDate(dateString) {
+      // Crear un objeto de fecha a partir de la cadena de fecha
+
+      const fecha = new Date(dateString);
+
+      // Obtener el año, mes y día en formato de número
+      const year = fecha.getFullYear();
+      const month = fecha.getMonth() + 1;
+      const day = fecha.getDate();
+
+      // Crear un string con la fecha en formato "yyyy-mm-dd"
+      const fechaFormateada = `${year}-${month
+        .toString()
+        .padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
+
+      return fechaFormateada;
+    },
     async getOrder(id) {
       try {
         const { data, error } = await this.$axios.get(`/orders/${id}`);
         this.order = data;
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     },
     async showOrder(id) {
       try {
         await this.getOrder(id);
-        console.log(this.order)
+        console.log(this.order);
         this.modals.viewOrder = true;
       } catch (error) {
         console.log(error);
@@ -212,6 +273,6 @@ export default {
 
 <style>
 .text-decoration-line-through {
-  text-decoration: line-through
+  text-decoration: line-through;
 }
 </style>

@@ -1,9 +1,18 @@
 <template>
-  <div>
-    <!-- your content here -->
-    <nuxt />
+  <div class="wrapper">
+    <notifications></notifications>
+
+    <router-view name="header"></router-view>
+
+    <div :class="{ content: true }" style="margin-top: 100px">
+      <zoom-center-transition :duration="200" mode="out-in">
+        <!-- your content here -->
+        <nuxt />
+      </zoom-center-transition>
+    </div>
   </div>
 </template>
+
   <script>
 /* eslint-disable no-new */
 import PerfectScrollbar from "perfect-scrollbar";
@@ -27,13 +36,13 @@ function initScrollbar(className) {
 import { SlideYDownTransition, ZoomCenterTransition } from "vue2-transitions";
 
 export default {
-  name: "auth",
+  name: "print",
   components: {
     ZoomCenterTransition,
   },
   data() {
     return {
-      sidebarBackground: "primary", //vue|blue|orange|green|red|primary
+      sidebarBackground: "vue", //vue|blue|orange|green|red|primary
     };
   },
 
@@ -67,6 +76,10 @@ export default {
   <style lang="scss">
 $scaleSize: 0.95;
 
+body {
+  background-color: white;
+}
+
 @keyframes zoomIn95 {
   from {
     opacity: 0;
@@ -97,4 +110,3 @@ $scaleSize: 0.95;
   animation-name: zoomOut95;
 }
 </style>
-  
