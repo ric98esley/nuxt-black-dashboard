@@ -12,7 +12,7 @@
             Departamento técnico <br />
             Calle 15, Barrio Obrero - San Cristobal <br />
             Teléfono: 0276-355-6947 <br />
-            Teléfono Realizado por:
+            Realizado por:
             <b> {{ order.createdBy?.name }} {{ order.createdBy?.lastName }} </b>
           </address>
         </td>
@@ -55,7 +55,7 @@
         <th>Serial</th>
         <th>Descripción</th>
       </tr>
-      <tr v-for="(assignment, index) in order.assignments">
+      <tr v-for="(assignment, index) in order.assignments" v-bind:key="index">
         <th>{{ index + 1 }}</th>
         <th>{{ formatDate(assignment.checkoutAt) }}</th>
         <th>{{ assignment.target?.serial }}</th>
@@ -99,7 +99,7 @@ export default {
   mounted() {
     this.getOrder().then(() => {
       window.print();
-      // setTimeout(window.close, 500);
+      setTimeout(window.close, 500);
     });
   },
   methods: {
