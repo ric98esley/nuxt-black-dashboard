@@ -43,7 +43,8 @@
         <th>{{ assignment.target?.serial }}</th>
         <th>
           {{ assignment.target.model.category.name }} -
-          {{ assignment.target.model?.brand?.name }} - {{ assignment.target.model.name }}
+          {{ assignment.target.model?.brand?.name }} -
+          {{ assignment.target.model.name }}
         </th>
       </tr>
     </table>
@@ -61,7 +62,10 @@ export default {
     };
   },
   mounted() {
-    this.getOrder();
+    this.getOrder().then(() => {
+      window.print();
+      setTimeout(window.close, 500);
+    });
   },
   methods: {
     formatDate(dateString) {
