@@ -97,7 +97,7 @@ export default {
         },
         {
           id: 5,
-          img: 'img/mike.jpg',
+          img: 'img/default-avatar.png',
           name: 'Paul Dickens',
           job: 'Develop',
           progress: 100,

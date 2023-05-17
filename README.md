@@ -194,7 +194,7 @@ Within the download you'll find the following directories and files:
     |       |-- polyfills.js
     |-- static
     |   |-- README.md
-    |   |-- favicon.png
+    |   |-- favicon.ico
     |   |-- icon.png
     |   |-- sw.js
     |   |-- img
