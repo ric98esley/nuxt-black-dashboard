@@ -6,7 +6,7 @@
         <form @submit.prevent="">
           <div class="row">
             <div class="col-md-6">
-              <label >Serial:</label>
+              <label>Serial:</label>
               {{ asset.serial }}
             </div>
             <div class="col-md-6">
@@ -33,28 +33,54 @@
               <label> Estado</label>
               {{ asset.state?.name }}
             </div>
-
           </div>
         </form>
       </card>
     </div>
     <div class="col-md-6">
       <card>
-        <base-button>
-          editar activo
-        </base-button>
+        <base-button> editar activo </base-button>
       </card>
     </div>
     <div class="col-md-6">
       <card>
         <h4>Historial de asignaciones</h4>
         <el-table :data="asset.assignments">
-          <el-table-column label="Fecha" prop="checkoutAt" min-width="150">
+          <el-table-column type="expand">
+            <template slot-scope="{ row }">
+              <div class="row">
+                <div class="col-12">
+                  <p>Asignado el: {{ row.checkoutAt }}</p>
+                  <p>
+                    Asignado por:
+                    <router-link to="/">
+                      {{ row.checkoutBy.name }}
+                      {{ row.checkoutBy.lastName }}</router-link
+                    >
+                  </p>
+                </div>
+                <div class="col-12" v-if="row.checkingAt">
+                  <p>Recibido el: {{ row.checkingAt }}</p>
+                  Recibido por:
+                  <router-link to="#">
+                    {{ row.checkingBy.name }}
+                    {{ row.checkingBy.lastName }}
+                  </router-link>
+                </div>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="Fecha" prop="checkoutAt">
             <template slot-scope="scope">
               {{ formatDate(scope.row.checkoutAt) }}
             </template>
           </el-table-column>
-          <el-table-column label="hecho por" prop="checkoutBy.username">
+          <el-table-column label="Asignado a">
+            <template slot-scope="{ row }">
+              <div v-if="row.assignmentType === 'location'">
+                {{ row.location?.code }}- {{ row.location?.name }}
+              </div>
+            </template>
           </el-table-column>
         </el-table>
       </card>
@@ -79,7 +105,7 @@ export default {
     [Select.name]: Select,
     [Table.name]: Table,
     [TableColumn.name]: TableColumn,
-    [Pagination.name]: Pagination
+    [Pagination.name]: Pagination,
   },
   data() {
     return {
@@ -102,15 +128,15 @@ export default {
       const day = fecha.getDate();
 
       // Crear un string con la fecha en formato "yyyy-mm-dd"
-      const fechaFormateada = `${year}-${month
-        .toString()
-        .padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
+      const fechaFormateada = `${day.toString().padStart(2, "0")}-${month.toString().padStart(2, "0")}-${year}
+      `;
 
       return fechaFormateada;
     },
     async getAsset() {
       const { data } = await this.$axios.get(`/assets/${this.id}`);
       this.asset = data;
+      console.log(this.asset);
     },
   },
 };

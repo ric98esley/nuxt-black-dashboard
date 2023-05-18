@@ -11,12 +11,19 @@
     <card class="col-md-9">
       <h4 slot="header" class="card-title">Lista de activos</h4>
       <el-table :data="assets.assets" class="table-striped">
+        <el-table-column type="expand">
+          <template slot-scope="props">
+            <p>Creado por: {{ props.row.createdBy.name }} {{ props.row.createdBy.lastName }}</p>
+            <p>Creado el : {{ props.row.createdAt}}</p>
+          </template>
+        </el-table-column>
         <el-table-column
           min-width="150"
           sortable
           label="Serial"
           property="serial"
-        ></el-table-column>
+        >
+        </el-table-column>
         <el-table-column
           min-width="120"
           sortable
@@ -593,3 +600,9 @@ export default {
   },
 };
 </script>
+
+<style>
+  .el-table__expanded-cell {
+    background-color: transparent;
+  }
+</style>

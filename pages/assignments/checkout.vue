@@ -300,7 +300,9 @@ export default {
     async getAssets() {
       try {
         let toSend = {
-          params: {},
+          params: {
+            state: 'desplegable'
+          },
         };
         if (this.toSearchAssets.length > 2) {
           toSend.params.serial = this.toSearchAssets;

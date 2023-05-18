@@ -1,9 +1,6 @@
 <template>
   <div class="print">
-    <div class="logo-print">
-      <img :src="logo" alt="logo" />
-    </div>
-    <table class="w-100">
+    <table class="w-100 table-print__header">
       <tr style="boder: 0; width: 300px">
         <td>
           <strong>Comercializadora la excelencia (Gana loterias)</strong>
@@ -15,23 +12,20 @@
             Realizado por:
             <b> {{ order.createdBy?.name }} {{ order.createdBy?.lastName }} </b>
           </address>
+            <th colspan="2"><strong>Datos de la asignación</strong></th>
+              {{
+                order.transactionType == "checkout"
+                  ? "Reporte de salida"
+                  : "Reporte de entrada"
+              }}
+              <br />
+              Fecha de impresion: {{ Date() }} <br />
+              Creado el: {{ formatDate(order.createdAt) }} <br />
         </td>
-      </tr>
-    </table>
-    <br />
-    <table class="w-100">
-      <tr>
+
         <td>
-          <strong>Datos de la asignación</strong><br />
-          {{
-            order.transactionType == "checkout"
-              ? "Reporte de salida"
-              : "Reporte de entrada"
-          }}
-          <br />
-          Fecha de impresion: {{ Date() }} <br />
-          Creado el: {{ formatDate(order.createdAt) }} <br />
           <template v-if="order.assignmentType == 'location'">
+            <strong>Datos de la agencia</strong> <br />
             {{ order.location?.code }} - {{ order.location?.name }} | Grupo:
             {{ order.location?.group.code }} - {{ order.location?.group.name }}
             <br />
@@ -43,21 +37,22 @@
             Teléfono: <b>{{ order.location?.manager.phone }}</b> <br />
           </template>
         </td>
-        <td style="boder: 0; width: 300px">
-          <b> Cantidad de activos: {{ order.assignments?.length }} </b>
+        <td>
+          <div class="logo-print">
+            <img :src="logo" alt="logo" />
+          </div>
         </td>
       </tr>
     </table>
+    <br />
     <table class="w-100 table-print">
       <tr>
         <th></th>
-        <th>Fecha</th>
         <th>Serial</th>
         <th>Descripción</th>
       </tr>
       <tr v-for="(assignment, index) in order.assignments" v-bind:key="index">
         <th>{{ index + 1 }}</th>
-        <th>{{ formatDate(assignment.checkoutAt) }}</th>
         <th>{{ assignment.target?.serial }}</th>
         <th>
           {{ assignment.target.model.category.name }} -
@@ -65,17 +60,25 @@
           {{ assignment.target.model.name }}
         </th>
       </tr>
-    </table>
-
-    <table class="w-100 disclaimer">
       <tr>
-        <th>
-          Con este documento el cliente, quien recibe, acepta la responsabilidad
-          de cuidar los articulos aquí descriptos y responder por ellos en caso
-          de robo, perdida o mal uso.
+        <th colspan="4">
+          <br><br>
+          <strong>Nota:</strong> Con este documento se hace constar el buen
+          funcionamiento de los activos asignados, así como también el
+          compromiso por el cuidado de los mismos por parte de quien recibe. Es
+          importante señalar que en caso de robo, pedida o mal uso, el cliente
+          asume la responsabilidad ante la empresa.
+        </th>
+      </tr>      <tr>
+        <th colspan="4">
+          <b>
+            Cantidad de activos asignados: {{ order.assignments?.length }}
+          </b>
         </th>
       </tr>
+
     </table>
+
     <table class="w-100 signs mt-5">
       <tr class="mt-5">
         <th>Firma del cliente</th>
@@ -99,7 +102,7 @@ export default {
   mounted() {
     this.getOrder().then(() => {
       window.print();
-      setTimeout(window.close, 500);
+      // setTimeout(window.close, 500);
     });
   },
   methods: {
@@ -149,16 +152,20 @@ export default {
 }
 .table-print {
   text-align: center;
-  border: 1px solid black;
   padding: 3px 2px;
 }
 .table-print tr th {
   font-weight: normal;
-  border: 1px solid black;
+}
+.table-print tr td {
+  font-weight: normal;
+}
+.table-print__header tr td {
+  font-weight: normal;
+  vertical-align: top;
 }
 .table-print tr:first-child th {
   font-weight: bold;
-  border: 1px solid black;
 }
 .disclaimer {
   text-align: center;
@@ -171,10 +178,6 @@ export default {
   text-align: center;
 }
 .logo-print {
-  width: 120px;
-  position: absolute;
-  right: 8px;
-  top: 8px;
-  z-index: 1;
+  width: 150px;
 }
 </style>
