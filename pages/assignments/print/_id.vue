@@ -1,82 +1,80 @@
 <template>
   <div class="print">
-    <table class="w-100 table-print__header">
-      <tr style="boder: 0; width: 300px">
-        <td>
-          <strong>Comercializadora la excelencia (Gana loterias)</strong>
-          <address>
-            Rif: J-29401587-5 <br />
-            Departamento técnico <br />
-            Calle 15, Barrio Obrero - San Cristobal <br />
-            Teléfono: 0276-355-6947 <br />
-            Realizado por:
-            <b> {{ order.createdBy?.name }} {{ order.createdBy?.lastName }} </b>
-          </address>
-            <th colspan="2"><strong>Datos de la asignación</strong></th>
-              {{
-                order.transactionType == "checkout"
-                  ? "Reporte de salida"
-                  : "Reporte de entrada"
-              }}
-              <br />
-              Fecha de impresion: {{ Date() }} <br />
-              Creado el: {{ formatDate(order.createdAt) }} <br />
-        </td>
-
-        <td>
-          <template v-if="order.assignmentType == 'location'">
-            <strong>Datos de la agencia</strong> <br />
-            {{ order.location?.code }} - {{ order.location?.name }} | Grupo:
-            {{ order.location?.group.code }} - {{ order.location?.group.name }}
-            <br />
-            Dirección: <b> {{ order.location?.address }} </b><br />
-            Numero de la taquilla: <b> {{ order.location?.phone }}</b>
-            <br /><br />
-            <strong> Datos del responsable de la agencia: </strong><br />
-            Nombre: <b> {{ order.location?.manager.name }}</b> <br />
-            Teléfono: <b>{{ order.location?.manager.phone }}</b> <br />
-          </template>
-        </td>
-        <td>
-          <div class="logo-print">
-            <img :src="logo" alt="logo" />
-          </div>
-        </td>
-      </tr>
-    </table>
+    <div class="w-100 d-flex justify-content-between">
+      <div class="col-6">
+        <img :src="logo" alt="logo" class="logo-print" />
+      </div>
+      <div class="col-6 text-right">
+        <strong>Comercializadora la excelencia (Gana loterias)</strong>
+        <address>
+          Rif: J-29401587-5 <br />
+          Departamento técnico <br />
+          Calle 15, Barrio Obrero - San Cristobal <br />
+          Teléfono: 0276-355-6947 <br />
+        </address>
+      </div>
+    </div>
     <br />
+    <div class="d-flex d-flex justify-content-between">
+      <template v-if="order.assignmentType == 'location'">
+        <div class="col-3">
+          <strong>Datos de la asignación</strong>
+          <br />
+          {{
+            order.transactionType == "checkout"
+              ? "Reporte de salida"
+              : "Reporte de entrada"
+          }}
+          <br />
+          Fecha de impresion: {{ formatDate(Date()) }} <br />
+          Creado el: {{ formatDate(order.createdAt) }} <br />
+          Realizado por:
+          <b> {{ order.createdBy?.name }} {{ order.createdBy?.lastName }} </b>
+        </div>
+        <div class="col-5">
+          <strong>Datos de la {{ order.location?.type.name }}</strong> <br />
+          {{ order.location?.code }} - {{ order.location?.name }} | Grupo:
+          {{ order.location?.group.code }} - {{ order.location?.group.name }}
+          <br />
+          Dirección: <b> {{ order.location?.address }} </b><br />
+          Numero de la {{ order.location?.type.name }}:
+          <b> {{ order.location?.phone }}</b>
+        </div>
+        <div class="col-3">
+          <strong>
+            Datos del responsable de la
+            {{ order.location?.type.name }}: </strong
+          ><br />
+          Nombre: <b> {{ order.location?.manager.name }}</b> <br />
+          Teléfono: <b>{{ order.location?.manager.phone }}</b> <br />
+        </div>
+      </template>
+    </div>
+    <br /><br />
     <table class="w-100 table-print">
       <tr>
         <th></th>
+        <th>Fecha</th>
         <th>Serial</th>
         <th>Descripción</th>
       </tr>
       <tr v-for="(assignment, index) in order.assignments" v-bind:key="index">
-        <th>{{ index + 1 }}</th>
-        <th>{{ assignment.target?.serial }}</th>
-        <th>
+        <td>{{ index + 1 }}</td>
+        <td></td>
+        <td>{{ assignment.target?.serial }}</td>
+        <td>
           {{ assignment.target.model.category.name }} -
           {{ assignment.target.model?.brand?.name }} -
           {{ assignment.target.model.name }}
-        </th>
+        </td>
       </tr>
       <tr>
-        <th colspan="4">
-          <br><br>
-          <strong>Nota:</strong> Con este documento se hace constar el buen
-          funcionamiento de los activos asignados, así como también el
-          compromiso por el cuidado de los mismos por parte de quien recibe. Es
-          importante señalar que en caso de robo, pedida o mal uso, el cliente
-          asume la responsabilidad ante la empresa.
-        </th>
-      </tr>      <tr>
         <th colspan="4">
           <b>
             Cantidad de activos asignados: {{ order.assignments?.length }}
           </b>
         </th>
       </tr>
-
     </table>
 
     <table class="w-100 signs mt-5">
@@ -85,6 +83,14 @@
         <th>Firma del tecnico</th>
       </tr>
     </table>
+    <div>
+      <br /><br />
+      <strong>Nota:</strong> Con este documento se hace constar el buen
+      funcionamiento de los activos asignados, así como también el compromiso
+      por el cuidado de los mismos por parte de quien recibe. Es importante
+      señalar que en caso de robo, pedida o mal uso, el cliente asume la
+      responsabilidad ante la empresa.
+    </div>
   </div>
 </template>
 

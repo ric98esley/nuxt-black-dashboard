@@ -39,6 +39,16 @@
           >
           </el-table-column>
         </el-table>
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page.sync="currentPage"
+          :page-sizes="[10, 20]"
+          :page-size="10"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="locations.total"
+        >
+        </el-pagination>
       </card>
     </div>
     <!-- buttons -->
@@ -167,7 +177,7 @@
                   >
                     <template #default="{ item }">
                       <div class="value">
-                        <b>{{ item.code }}</b 
+                        <b>{{ item.code }}</b
                         >, <span class="link">{{ item.name }}</span>
                       </div>
                     </template>
@@ -177,10 +187,16 @@
             </div>
             <div class="row">
               <div class="col-lg-6">
-                <base-input label="Telefono del local" v-model="location.phone"></base-input>
+                <base-input
+                  label="Telefono del local"
+                  v-model="location.phone"
+                ></base-input>
               </div>
               <div class="col-lg-6">
-                <base-input label="Rif del local" v-model="location.rif"></base-input>
+                <base-input
+                  label="Rif del local"
+                  v-model="location.rif"
+                ></base-input>
               </div>
             </div>
             <div class="row">
@@ -227,7 +243,7 @@
 </template>
 <script>
 import { BaseSwitch, Modal, BasePagination } from "@/components";
-import { Select, Option, Table, TableColumn, Autocomplete } from "element-ui";
+import { Select, Option, Table, TableColumn, Autocomplete, Pagination } from "element-ui";
 
 export default {
   middleware: "authenticated",
@@ -237,6 +253,7 @@ export default {
     [Table.name]: Table,
     [TableColumn.name]: TableColumn,
     [Autocomplete.name]: Autocomplete,
+    [Pagination.name]: Pagination,
     BasePagination,
     BaseSwitch,
     Modal,
@@ -317,11 +334,11 @@ export default {
     },
     handleSizeChange(val) {
       this.limit = val;
-      this.getUsers();
+      this.getLocations();
     },
     handleCurrentChange(val) {
       this.offset = (val - 1) * this.limit;
-      this.getUsers();
+      this.getLocations();
     },
     removeNullProps(obj) {
       for (let prop in obj) {
@@ -369,8 +386,8 @@ export default {
           message: `Agencia creada correctamente:
           ${data.name} - ${data.code}
           `,
-          type: 'success'
-        })
+          type: "success",
+        });
         console.log(data);
       } catch (error) {
         console.log(error);
@@ -388,8 +405,8 @@ export default {
         this.getZones();
         this.$notify({
           message: `Zona creada: ${data.zoneName}`,
-          type: 'success'
-        })
+          type: "success",
+        });
       } catch (error) {
         console.log(error);
       }
@@ -413,10 +430,7 @@ export default {
       if (queryString.length > 2) {
         toSend.params.code = queryString;
       }
-      const { data, error } = await this.$axios.get(
-        "/groups",
-        toSend
-      );
+      const { data, error } = await this.$axios.get("/groups", toSend);
       cb(data.groups);
     },
     async getUsers(queryString, cb) {

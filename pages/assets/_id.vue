@@ -89,6 +89,7 @@
       <card>
         <h4>Historial mantenimientos</h4>
         <el-table></el-table>
+        <barcode :value="asset.serial" format="codabar"></barcode>
       </card>
     </div>
   </div>
@@ -96,6 +97,7 @@
 
 <script>
 import { Select, Option, Table, TableColumn, Pagination } from "element-ui";
+import VueBarcode from 'vue-barcode';
 
 export default {
   name: "AssetDetails",
@@ -106,6 +108,7 @@ export default {
     [Table.name]: Table,
     [TableColumn.name]: TableColumn,
     [Pagination.name]: Pagination,
+    'barcode': VueBarcode
   },
   data() {
     return {
