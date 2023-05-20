@@ -64,7 +64,8 @@ export default {
    */
   plugins: [
     `~/plugins/dashboard-plugin.js`,
-    `~/plugins/axios`
+    `~/plugins/axios.js`,
+    `~/plugins/printd.js`
   ],
   /*
    ** Nuxt.js dev-modules

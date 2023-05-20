@@ -89,7 +89,10 @@
       <card>
         <h4>Historial mantenimientos</h4>
         <el-table></el-table>
-        <barcode :value="asset.serial" format="codabar"></barcode>
+        <div id="barcode">
+          <barcode :value="asset.serial" format="CODE128" width="1" height="30"></barcode>
+        </div>
+        <base-button @click="print"> imprimir codigo de barras </base-button>
       </card>
     </div>
   </div>
@@ -97,7 +100,7 @@
 
 <script>
 import { Select, Option, Table, TableColumn, Pagination } from "element-ui";
-import VueBarcode from 'vue-barcode';
+import VueBarcode from "vue-barcode";
 
 export default {
   name: "AssetDetails",
@@ -108,7 +111,7 @@ export default {
     [Table.name]: Table,
     [TableColumn.name]: TableColumn,
     [Pagination.name]: Pagination,
-    'barcode': VueBarcode
+    barcode: VueBarcode,
   },
   data() {
     return {
@@ -120,6 +123,9 @@ export default {
     this.getAsset();
   },
   methods: {
+    async print() {
+      console.log(this.$Printd.print(document.getElementById('barcode')));
+    },
     formatDate(dateString) {
       // Crear un objeto de fecha a partir de la cadena de fecha
 
@@ -131,7 +137,9 @@ export default {
       const day = fecha.getDate();
 
       // Crear un string con la fecha en formato "yyyy-mm-dd"
-      const fechaFormateada = `${day.toString().padStart(2, "0")}-${month.toString().padStart(2, "0")}-${year}
+      const fechaFormateada = `${day.toString().padStart(2, "0")}-${month
+        .toString()
+        .padStart(2, "0")}-${year}
       `;
 
       return fechaFormateada;
