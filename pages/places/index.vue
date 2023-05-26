@@ -38,6 +38,24 @@
             property="zone.zoneName"
           >
           </el-table-column>
+          <el-table-column header-align="right" >
+            <div slot-scope="{ row }" class="text-right">
+              <el-tooltip
+                content="Información"
+                :open-delay="300"
+                placement="top"
+              >
+                <base-button
+                  type="info"
+                  size="sm"
+                  icon
+                  @click="$nuxt.$router.push(`/places/${row.id}`)"
+                >
+                  <i class="fa fa-regular fa-eye"></i>
+                </base-button>
+              </el-tooltip>
+            </div>
+          </el-table-column>
         </el-table>
         <el-pagination
           @size-change="handleSizeChange"
@@ -243,7 +261,14 @@
 </template>
 <script>
 import { BaseSwitch, Modal, BasePagination } from "@/components";
-import { Select, Option, Table, TableColumn, Autocomplete, Pagination } from "element-ui";
+import {
+  Select,
+  Option,
+  Table,
+  TableColumn,
+  Autocomplete,
+  Pagination,
+} from "element-ui";
 
 export default {
   middleware: "authenticated",

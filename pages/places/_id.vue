@@ -15,7 +15,7 @@
             </div>
             <div class="col-md-6">
               <label> Fecha de creación</label>
-              {{ new Date().toLocaleString() }}
+              {{ new Date(location?.createdAt).toLocaleString() }}
             </div>
             <div class="col-md-6">
               <label> Direccion</label>
@@ -32,8 +32,7 @@
         </base-button>
       </card>
     </div>
-    <div class="col-md-6">
-    </div>
+    <div class="col-md-6"></div>
     <div class="col-md-6">
       <card>
         <h4>Asignaciones actuales</h4>
@@ -62,15 +61,19 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="Fecha" prop="checkoutAt">
-            <template slot-scope="scope">
-              {{ formatDate(scope.row.checkoutAt) }}
+          <el-table-column label="Fecha">
+            <template slot-scope="{ row }">
+              {{ new Date(row.checkoutAt).toLocaleString() }}
             </template>
           </el-table-column>
-          <el-table-column label="Asignado a">
+          <el-table-column label="Serial" prop="target.serial">
+          </el-table-column>
+          <el-table-column label="Descripción">
             <template slot-scope="{ row }">
-              <div v-if="row.assignmentType === 'location'">
-                {{ row.location?.code }}- {{ row.location?.name }}
+              <div>
+                {{ row.target.model.category.name }} -
+                {{ row.target.model?.brand?.name }} -
+                {{ row.target.model.name }}
               </div>
             </template>
           </el-table-column>
@@ -79,67 +82,125 @@
     </div>
     <div class="col-md-6">
       <card>
-        <h4>Historial mantenimientos</h4>
-        <el-table></el-table>
+        <h4>Asignaciones antiguas</h4>
+        <el-table :data="location?.oldAssignments">
+          <el-table-column type="expand">
+            <template slot-scope="{ row }">
+              <div class="row">
+                <div class="col-12">
+                  <p>Asignado el: {{ row.checkoutAt }}</p>
+                  <p>
+                    Asignado por:
+                    <router-link to="/">
+                      {{ row.checkoutBy.name }}
+                      {{ row.checkoutBy.lastName }}</router-link
+                    >
+                  </p>
+                </div>
+                <div class="col-12" v-if="row.checkingAt">
+                  <p>Recibido el: {{ row.checkingAt }}</p>
+                  Recibido por:
+                  <router-link to="#">
+                    {{ row.checkingBy.name }}
+                    {{ row.checkingBy.lastName }}
+                  </router-link>
+                </div>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="Fecha" prop="checkoutAt">
+            <template slot-scope="{ row }">
+              {{ new Date(row.checkoutAt).toLocaleString() }}
+            </template>
+          </el-table-column>
+          <el-table-column label="serial" prop="target.serial">
+          </el-table-column>
+          <el-table-column label="Descripción">
+            <template slot-scope="{ row }">
+              <div>
+                {{ row.target.model.category.name }} -
+                {{ row.target.model?.brand?.name }} -
+                {{ row.target.model.name }}
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
       </card>
     </div>
     <!-- Modals -->
     <div>
       <modal
-        :show.sync="modals.updatelocation"
-        body-classes="p-0"
-        modal-classes="modal-dialog-centered"
+        :show.sync="modals.updateLocation"
+        modal-classes="modal-dialog-centered modal-lg"
       >
         <card class="p-3">
-          <h5 slot="header" class="title">Editar activo</h5>
-          <form @submit.prevent="updatelocation">
+          <h5 slot="header" class="title">Actualizar localización</h5>
+          <form @submit.prevent="updateLocation">
             <div class="row">
-              <div class="col-md-12">
+              <div class="col-lg-4">
+                <base-input type="text" label="Nombre" v-model="toUpdate.name">
+                </base-input>
+              </div>
+              <div class="col-lg-4">
                 <base-input
                   type="text"
-                  label="Serial"
-                  v-model="location.serial"
+                  label="Codigo"
+                  v-model="location.code"
                   disabled
                 >
                 </base-input>
               </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-12">
-                <base-input type="text" label="Modelo">
+              <div class="col-lg-4">
+                <base-input type="text" label="Zona">
                   <el-select
-                    v-model="toUpdate.modelId"
-                    filterable
+                    v-model="toUpdate.zoneId"
                     class="select-success"
-                    placeholder="Selecciona una categoria"
-                    label="Categoria"
+                    placeholder="Selecciona una zona"
                     style="width: 100%"
+                    filterable
                   >
                     <el-option
-                      v-for="option in models"
+                      v-for="option in zones"
                       :key="option.id"
                       :value="option.id"
-                      :label="`${option.category.name} - ${option.name} - ${option.brand?.name}`"
+                      :label="option.zoneName"
                     >
                     </el-option>
                   </el-select>
                 </base-input>
               </div>
             </div>
-
             <div class="row">
-              <div class="col-md-12">
-                <base-input type="text" label="Estado">
+              <div class="col-lg-4">
+                <base-input type="text" label="Padre">
+                  <el-autocomplete
+                    class="w-100"
+                    :trigger-on-focus="false"
+                    clearable
+                    v-model="parent.code"
+                    :fetch-suggestions="getParent"
+                    placeholder="Buscar lugar"
+                    @select="handleSelectParent"
+                  >
+                    <template #default="{ item }">
+                      <div class="value">
+                        <b>{{ item.name }}</b
+                        >,
+                        <span class="link">{{ item.code }}</span>
+                      </div>
+                    </template>
+                  </el-autocomplete>
+                </base-input>
+              </div>
+              <div class="col-lg-4">
+                <base-input type="text" label="Tipo">
                   <el-select
-                    v-model="toUpdate.locationStateId"
+                    v-model="toUpdate.typeId"
                     class="select-success"
-                    placeholder="Selecciona un estado"
-                    label="Categoria"
-                    style="width: 100%"
+                    placeholder="Selecciona un tipo"
                   >
                     <el-option
-                      v-for="option in states"
+                      v-for="option in locationTypes.types"
                       :key="option.id"
                       :value="option.id"
                       :label="option.name"
@@ -148,10 +209,75 @@
                   </el-select>
                 </base-input>
               </div>
+              <div class="col-lg-4">
+                <base-input label="A cargo de" type="text">
+                  <el-autocomplete
+                    class="w-100"
+                    :trigger-on-focus="false"
+                    clearable
+                    v-model="manager.name"
+                    :fetch-suggestions="getUsers"
+                    placeholder="Buscar usuario"
+                    @select="handleSelectManager"
+                  >
+                    <template #default="{ item }">
+                      <div class="value">
+                        <b>{{ item.username }}</b
+                        >, <span class="link">{{ item.role }}</span>
+                      </div>
+                    </template>
+                  </el-autocomplete>
+                </base-input>
+              </div>
+              <div class="col-lg-12">
+                <base-input label="Grupo">
+                  <el-autocomplete
+                    class="w-100"
+                    :trigger-on-focus="false"
+                    clearable
+                    v-model="group.name"
+                    :fetch-suggestions="getGroups"
+                    placeholder="Buscar grupos"
+                    @select="handleSelectGroup"
+                  >
+                    <template #default="{ item }">
+                      <div class="value">
+                        <b>{{ item.code }}</b
+                        >, <span class="link">{{ item.name }}</span>
+                      </div>
+                    </template>
+                  </el-autocomplete>
+                </base-input>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-6">
+                <base-input
+                  label="Telefono del local"
+                  v-model="toUpdate.phone"
+                ></base-input>
+              </div>
+              <div class="col-lg-6">
+                <base-input
+                  label="Rif del local"
+                  v-model="toUpdate.rif"
+                ></base-input>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-12">
+                <base-input
+                  v-model="toUpdate.address"
+                  class="select-success"
+                  placeholder="Calle falsa al lado de la casa de mentiras"
+                  label="Dirección"
+                >
+                </base-input>
+              </div>
             </div>
 
             <base-button native-type="submit" type="primary" class="btn-fill">
-              Crear activo
+              actualizar
             </base-button>
           </form>
         </card>
@@ -161,7 +287,14 @@
 </template>
 
 <script>
-import { Select, Option, Table, TableColumn, Pagination } from "element-ui";
+import {
+  Select,
+  Option,
+  Table,
+  TableColumn,
+  Pagination,
+  Autocomplete,
+} from "element-ui";
 import VueBarcode from "vue-barcode";
 import { BaseSwitch, Modal } from "@/components";
 
@@ -174,6 +307,7 @@ export default {
     [Table.name]: Table,
     [TableColumn.name]: TableColumn,
     [Pagination.name]: Pagination,
+    [Autocomplete.name]: Autocomplete,
     barcode: VueBarcode,
     Modal,
   },
@@ -181,19 +315,63 @@ export default {
     return {
       id: this.$route.params.id,
       modals: {
-        updatelocation: false,
+        updateLocation: false,
       },
-      location: {},
+      locationTypes: {},
+      locations: {},
+      groups: {},
+      zones: [],
+      location: {
+        code: null,
+        name: null,
+        typeId: null,
+        groupId: null,
+        phone: null,
+        rif: null,
+        parentId: null,
+        managerId: null,
+        zoneId: null,
+        address: null,
+      },
+      parent: {},
+      manager: {},
+      group: {},
       place: {},
-      toUpdate: {},
       states: [],
       models: [],
     };
   },
   mounted() {
     this.getLocation();
+    this.getZones();
+    this.getLocationType();
+  },
+  computed: {
+    toUpdate() {
+      return { ...this.location };
+    },
+  },
+  watch: {
+    manager(newState, lastState) {
+      this.toUpdate.managerId = newState.id;
+    },
+    parent(newState, lastState) {
+      this.toUpdate.parentId = newState.id;
+    },
+    group(newState, lastState) {
+      this.toUpdate.groupId = newState.id;
+    },
   },
   methods: {
+    handleSelectParent(item) {
+      this.parent = item;
+    },
+    handleSelectManager(item) {
+      this.manager = item;
+    },
+    handleSelectGroup(item) {
+      this.group = item;
+    },
     async print() {
       console.log(this.$Printd.print(document.getElementById("barcode")));
     },
@@ -215,24 +393,91 @@ export default {
 
       return fechaFormateada;
     },
+    async getLocationType() {
+      try {
+        const { data, error } = await this.$axios.get("/locations/types");
+        this.locationTypes = data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async getParent(queryString, cb) {
+      const toSend = {
+        params: {},
+      };
+      if (queryString.length > 2) {
+        toSend.params.code = queryString;
+      }
+
+      const { data, error } = await this.$axios.get("/locations", toSend);
+      cb(data.locations);
+    },
     async getLocation() {
-      const { data } = await this.$axios.get(`/locations/${this.id}`);
-      this.location = data;
-      console.log(data);
+      try {
+        const { data } = await this.$axios.get(`/locations/${this.id}`);
+        this.location = data;
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async getGroups(queryString, cb) {
+      const toSend = {
+        params: {},
+      };
+      if (queryString.length > 2) {
+        toSend.params.code = queryString;
+      }
+      const { data, error } = await this.$axios.get("/groups", toSend);
+      cb(data.groups);
+    },
+    async getUsers(queryString, cb) {
+      try {
+        let toSend = {
+          params: {},
+        };
+
+        if (queryString.length > 2) {
+          toSend.params.username = queryString;
+        }
+
+        const { data, error } = await this.$axios.get("/users", toSend);
+        cb(data.users);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async getZones() {
+      try {
+        const toSend = {
+          params: {},
+        };
+
+        const { data, error } = await this.$axios.get("/locations/zones");
+
+        this.zones = data;
+      } catch (error) {
+        console.log(error);
+      }
     },
     async updateLocation() {
       try {
-        const toSend = { ...this.toUpdate };
+
+        const toSend = {};
+        for( let item in this.toUpdate) {
+          if(!(this.toUpdate[item] === this.location[item])) {
+            toSend[item] = this.toUpdate[item];
+          }
+        }
+        
         const { data, error } = await this.$axios.patch(
           `/locations/${this.id}`,
           toSend
         );
         this.$notify({
-          message: `activo actualizado correctamente`,
+          message: `${this.toUpdate.type.name} actualizado correctamente`,
           type: "success",
         });
-        this.toUpdate = {};
-        this.getlocation();
+        await this.getLocation();
         this.modals.updateLocation = false;
       } catch (error) {
         console.log(error);

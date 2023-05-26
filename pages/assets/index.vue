@@ -13,36 +13,34 @@
       <el-table :data="assets.assets" class="table-striped">
         <el-table-column type="expand">
           <template slot-scope="props">
-            <p>Creado por: {{ props.row.createdBy.name }} {{ props.row.createdBy.lastName }}</p>
-            <p>Creado el : {{ props.row.createdAt}}</p>
+            <p>
+              Creado por: {{ props.row.createdBy.name }}
+              {{ props.row.createdBy.lastName }}
+            </p>
+            <p>Creado el : {{ props.row.createdAt }}</p>
           </template>
         </el-table-column>
         <el-table-column
-          min-width="150"
           sortable
           label="Serial"
           property="serial"
         >
         </el-table-column>
         <el-table-column
-          min-width="120"
           sortable
           label="Estado"
           property="state.name"
         ></el-table-column>
-        <el-table-column
-          min-width="100"
-          sortable
-          label="Modelo"
-          property="model.name"
-        ></el-table-column>
-        <el-table-column
-          min-width="100"
-          sortable
-          label="Tipo"
-          property="model.category.name"
-        ></el-table-column>
-        <el-table-column min-width="90" header-align="right" label="Detalles">
+        <el-table-column label="Descripción">
+          <template slot-scope="{ row }">
+            <div>
+              {{ row.model?.category.name }} -
+              {{ row.model?.brand?.name }} -
+              {{ row.model.name }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column header-align="right">
           <div slot-scope="{ row }" class="text-right">
             <el-tooltip content="Información" :open-delay="300" placement="top">
               <base-button
@@ -602,7 +600,7 @@ export default {
 </script>
 
 <style>
-  .el-table__expanded-cell {
-    background-color: transparent;
-  }
+.el-table__expanded-cell {
+  background-color: transparent;
+}
 </style>
