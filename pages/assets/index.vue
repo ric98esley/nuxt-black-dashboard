@@ -20,11 +20,7 @@
             <p>Creado el : {{ props.row.createdAt }}</p>
           </template>
         </el-table-column>
-        <el-table-column
-          sortable
-          label="Serial"
-          property="serial"
-        >
+        <el-table-column sortable label="Serial" property="serial">
         </el-table-column>
         <el-table-column
           sortable
@@ -34,8 +30,7 @@
         <el-table-column label="Descripción">
           <template slot-scope="{ row }">
             <div>
-              {{ row.model?.category.name }} -
-              {{ row.model?.brand?.name }} -
+              {{ row.model?.category.name }} - {{ row.model?.brand?.name }} -
               {{ row.model.name }}
             </div>
           </template>
@@ -50,6 +45,16 @@
                 @click="$nuxt.$router.push(`/assets/${row.id}`)"
               >
                 <i class="fa fa-regular fa-eye"></i>
+              </base-button>
+            </el-tooltip>
+            <el-tooltip content="Editar" :open-delay="300" placement="top">
+              <base-button
+                type="danger"
+                size="sm"
+                icon
+                @click="modals.updateAssetState = true"
+              >
+                <i class="fa fa-regular fa-pen"></i>
               </base-button>
             </el-tooltip>
           </div>
@@ -348,6 +353,37 @@
           </form>
         </card>
       </modal>
+      <modal
+        :show.sync="modals.updateAssetState"
+        body-classes="p-0"
+        modal-classes="modal-dialog-centered modal-sm"
+      >
+        <card>
+          <form @submit.prevent="updateState">
+            <div class="row">
+              <div class="col-md-12">
+                <base-input type="text" label="Estado">
+                  <el-select
+                    v-model="asset.assetStateId"
+                    class="select-success"
+                    placeholder="Selecciona un estado"
+                    label="Categoria"
+                    style="width: 100%"
+                  >
+                    <el-option
+                      v-for="option in states"
+                      :key="option.id"
+                      :value="option.id"
+                      :label="option.name"
+                    >
+                    </el-option>
+                  </el-select>
+                </base-input>
+              </div>
+            </div>
+          </form>
+        </card>
+      </modal>
     </div>
   </div>
 </template>
@@ -378,6 +414,7 @@ export default {
         createCategory: false,
         createModel: false,
         createBrand: false,
+        updateAssetState: false,
       },
       assets: [],
       brands: [],
@@ -593,6 +630,21 @@ export default {
         this.getModels();
       } catch (error) {
         console.log(error);
+      }
+    },
+    async updateAsset() {
+      try {
+        const { assetStateId } = this.asset
+        const { data, error } = await this.$axios.patch(`/assets/${this.id}`, {assetStateId});
+        this.$notify({
+          message: `activo actualizado correctamente`,
+          type: "success",
+        })
+        this.toUpdate = {}
+        this.getAsset();
+        this.modals.updateAsset = false
+      } catch (error) {
+        console.log(error)
       }
     },
   },

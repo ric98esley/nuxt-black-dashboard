@@ -91,6 +91,11 @@
                 {{ row.location?.code }}- {{ row.location?.name }}
               </div>
             </template>
+            <template slot-scope="{ row }">
+              <div v-if="row.assignmentType === 'user'">
+                {{ row.user?.name }} {{ row.user?.lastName }}
+              </div>
+            </template>
           </el-table-column>
         </el-table>
       </card>

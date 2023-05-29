@@ -15,34 +15,21 @@
       </div>
     </div>
     <br />
-    <div class="d-flex d-flex justify-content-between">
-        <div class="col-3">
-          <strong>Datos de la asignación</strong>
-          <br />
-          Reporte de inventario
-          <br />
-          Fecha de impresion: {{ new Date().toLocaleString() }} <br />
-          Creado el: {{ new Date(location.createdAt).toLocaleString() }} <br />
-          Realizado por:
-          <b> {{ location.createdBy?.name }} {{ location.createdBy?.lastName }} </b>
-        </div>
-        <div class="col-5">
-          <strong>Datos de la {{ location.type?.name }}</strong> <br />
-          {{ location.code }} - {{ location?.name }} | Grupo:
-          {{ location.group?.code }} - {{ location.group?.name }}
-          <br />
-          Dirección: <b> {{ location.address }} </b><br />
-          Numero de la {{ location.type?.name }}:
-          <b> {{ location?.phone }}</b>
-        </div>
-        <div class="col-3">
-          <strong>
-            Datos del responsable de la
-            {{ location.type?.name }}: </strong
-          ><br />
-          Nombre: <b> {{ location.manager?.name }}</b> <br />
-          Teléfono: <b>{{ location.manager?.phone }}</b> <br />
-        </div>
+    <div class="row justify-content-between">
+      <div class="col-3">
+        <strong>Datos de la asignación</strong>
+        <br />
+        Reporte de inventario
+        <br />
+        Fecha de impresion: {{ new Date().toLocaleString() }} <br />
+      </div>
+      <div class="col-8">
+        <strong>Datos de {{ user?.username }}</strong> <br />
+        {{ user?.name }} {{ user?.lastName }} <br />
+        <b>Teléfono:</b> {{ user?.phone }} <br />
+        <b>Email:</b> {{ user?.email }} <br />
+        <b>Cedula:</b> {{ user?.cardId }}
+      </div>
     </div>
     <br /><br />
     <table class="w-100 table-print">
@@ -52,21 +39,19 @@
         <th>Serial</th>
         <th>Descripción</th>
       </tr>
-      <tr v-for="(assignment, index) in location.assignments" v-bind:key="index">
+      <tr v-for="(assignment, index) in user.assignments" v-bind:key="index">
         <td>{{ index + 1 }}</td>
-        <td>{{ new Date(assignment.checkoutAt).toLocaleString()}}</td>
+        <td>{{ new Date(assignment.checkoutAt).toLocaleString() }}</td>
         <td>{{ assignment.target?.serial }}</td>
         <td>
-          {{ assignment.target?.model.category.name }} -
-          {{ assignment.target?.model?.brand?.name }} -
-          {{ assignment.target?.model.name }}
+          {{ assignment.target.model.category.name }} -
+          {{ assignment.target.model?.brand?.name }} -
+          {{ assignment.target.model.name }}
         </td>
       </tr>
       <tr>
         <th colspan="4">
-          <b>
-            Cantidad de activos asignados: {{ location.assignments?.length }}
-          </b>
+          <b> Cantidad de activos asignados: {{ user.assignments?.length }} </b>
         </th>
       </tr>
     </table>
@@ -82,7 +67,7 @@
       <strong>Nota:</strong> Con este documento se hace constar el buen
       funcionamiento de los activos asignados, así como también el compromiso
       por el cuidado de los mismos por parte de quien recibe. Es importante
-      señalar que en caso de pedida o mal uso, el cliente asume la
+      señalar que en caso de robo, pedida o mal uso, el cliente asume la
       responsabilidad ante la empresa.
     </div>
   </div>
@@ -95,26 +80,22 @@ export default {
   data() {
     return {
       id: this.$route.params.id,
-      location: {
-        name: null
-      },
+      user: {},
       logo: "/img/logo.png",
     };
   },
   mounted() {
-    this.getLocation().then(() => {
+    this.getUser().then(() => {
       window.print();
       setTimeout(window.close, 500);
     });
   },
   methods: {
-
-    async getLocation() {
+    async getUser() {
       try {
-        console.log("adfadf");
-        const { data, error } = await this.$axios.get(`/locations/${this.id}`);
-        this.location = data;
-        console.log(this.location);
+        const { data, error } = await this.$axios.get(`/users/${this.id}`);
+        this.user = data;
+        console.log(data);
       } catch (error) {
         console.log(error);
       }
