@@ -344,7 +344,6 @@ export default {
         });
         return;
       }
-      console.log(toSend);
       try {
         const {data, error} = await this.$axios.post("/orders/checkout", toSend);
         this.$notify({
@@ -352,8 +351,7 @@ export default {
           timeout: 3000,
           icon: "tim-icons icon-bell-55",
         });
-        const routeData = $nuxt.$router.resolve(`/assignments/print/${data.id}`);
-        window.open(routeData.href, '_blank');
+        window.open(`/assignments/print/${data.id}`, '_blank');
       } catch (error) {
         this.$notify({
           message: "Algo ocurrio mal",

@@ -47,8 +47,8 @@
                 :open-delay="300"
                 placement="top"
               >
-                <base-button type="info" size="sm" icon @click="viewUser(row)">
-                  <i class="fa fa-regular fa-eye"></i>
+                <base-button type="info" size="sm" icon @click="$nuxt.$router.push(`/users/${row.id}`)">
+                    <i class="fa fa-regular fa-eye"></i>
                 </base-button>
               </el-tooltip>
             </div>
@@ -323,10 +323,7 @@ export default {
       } catch (error) {
         console.log(error);
       }
-    },
-    viewUser(row) {
-      console.log(row);
-    },
+    }
   },
 };
 </script>

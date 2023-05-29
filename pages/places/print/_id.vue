@@ -16,46 +16,33 @@
     </div>
     <br />
     <div class="d-flex d-flex justify-content-between">
-              <div class="col-3">
+      <template v-if="location.assignmentType == 'location'">
+        <div class="col-3">
           <strong>Datos de la asignación</strong>
           <br />
-          {{
-            order.transactionType == "checkout"
-              ? "Reporte de salida"
-              : "Reporte de entrada"
-          }}
+          Reporte de inventario
           <br />
-          Fecha de impresion: {{ new Date().toLocaleString() }} <br />
-          Creado el: {{ new Date(order.createdAt).toLocaleString() }} <br />
+          Fecha de impresion: {{ new Date().toLocaleString }} <br />
+          Creado el: {{ new Date(location.createdAt).toLocaleString() }} <br />
           Realizado por:
-          <b> {{ order.createdBy?.name }} {{ order.createdBy?.lastName }} </b>
+          <b> {{ location.createdBy?.name }} {{ location.createdBy?.lastName }} </b>
         </div>
-      <template v-if="order.assignmentType == 'user'">
-        <div class="col-8">
-          <strong>Datos de {{ order.user?.username}}</strong> <br>
-          {{ order.user?.name }} {{ order.user?.lastName }} <br>
-          <b>Teléfono:</b> {{ order.user?.phone }} <br>
-          <b>Email:</b> {{ order.user?.email}} <br>
-          <b>Cedula:</b> {{order.user?.cardId}}
-        </div>
-      </template>
-      <template v-if="order.assignmentType == 'location'">
         <div class="col-5">
-          <strong>Datos de la {{ order.location?.type.name }}</strong> <br />
-          {{ order.location?.code }} - {{ order.location?.name }} | Grupo:
-          {{ order.location?.group.code }} - {{ order.location?.group.name }}
+          <strong>Datos de la {{ location.type?.name }}</strong> <br />
+          {{ location.code }} - {{ location?.name }} | Grupo:
+          {{ location.group?.code }} - {{ location.group?.name }}
           <br />
-          Dirección: <b> {{ order.location?.address }} </b><br />
-          Numero de la {{ order.location?.type.name }}:
-          <b> {{ order.location?.phone }}</b>
+          Dirección: <b> {{ location.address }} </b><br />
+          Numero de la {{ location.type?.name }}:
+          <b> {{ location?.phone }}</b>
         </div>
         <div class="col-3">
           <strong>
             Datos del responsable de la
-            {{ order.location?.type.name }}: </strong
+            {{ location.type.name }}: </strong
           ><br />
-          Nombre: <b> {{ order.location?.manager.name }}</b> <br />
-          Teléfono: <b>{{ order.location?.manager.phone }}</b> <br />
+          Nombre: <b> {{ location.manager?.name }}</b> <br />
+          Teléfono: <b>{{ location.manager?.phone }}</b> <br />
         </div>
       </template>
     </div>
@@ -67,7 +54,7 @@
         <th>Serial</th>
         <th>Descripción</th>
       </tr>
-      <tr v-for="(assignment, index) in order.assignments" v-bind:key="index">
+      <tr v-for="(assignment, index) in location.assignments" v-bind:key="index">
         <td>{{ index + 1 }}</td>
         <td>{{ new Date(assignment.checkoutAt).toLocaleString()}}</td>
         <td>{{ assignment.target?.serial }}</td>
@@ -80,7 +67,7 @@
       <tr>
         <th colspan="4">
           <b>
-            Cantidad de activos asignados: {{ order.assignments?.length }}
+            Cantidad de activos asignados: {{ location.assignments?.length }}
           </b>
         </th>
       </tr>
@@ -110,40 +97,24 @@ export default {
   data() {
     return {
       id: this.$route.params.id,
-      order: {},
+      location: {},
       logo: "/img/logo.png",
     };
   },
   mounted() {
-    this.getOrder().then(() => {
+    this.getLocation().then(() => {
       window.print();
       setTimeout(window.close, 500);
     });
   },
   methods: {
-    formatDate(dateString) {
-      // Crear un objeto de fecha a partir de la cadena de fecha
 
-      const fecha = new Date(dateString);
-
-      // Obtener el año, mes y día en formato de número
-      const year = fecha.getFullYear();
-      const month = fecha.getMonth() + 1;
-      const day = fecha.getDate();
-
-      // Crear un string con la fecha en formato "yyyy-mm-dd"
-      const fechaFormateada = `${year}-${month
-        .toString()
-        .padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
-
-      return fechaFormateada;
-    },
-    async getOrder() {
+    async getLocation() {
       try {
         console.log("adfadf");
-        const { data, error } = await this.$axios.get(`/orders/${this.id}`);
-        this.order = data;
-        console.log(this.order);
+        const { data, error } = await this.$axios.get(`/locations/${this.id}`);
+        this.location = data;
+        console.log(this.location);
       } catch (error) {
         console.log(error);
       }
