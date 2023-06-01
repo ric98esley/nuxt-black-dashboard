@@ -155,7 +155,7 @@
               <div class="col-md-12">
                 <base-input type="text" label="Estado">
                   <el-select
-                    v-model="toUpdate.assetStateId"
+                    v-model="toUpdate.stateId"
                     class="select-success"
                     placeholder="Selecciona un estado"
                     label="Categoria"

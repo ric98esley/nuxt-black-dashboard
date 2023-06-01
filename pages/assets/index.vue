@@ -52,7 +52,7 @@
                 type="danger"
                 size="sm"
                 icon
-                @click="modals.updateAssetState = true"
+                @click="showUpdateStateModal(row.id)"
               >
                 <i class="fa fa-regular fa-pen"></i>
               </base-button>
@@ -162,7 +162,7 @@
               <div class="col-md-12">
                 <base-input type="text" label="Estado">
                   <el-select
-                    v-model="asset.assetStateId"
+                    v-model="asset.stateId"
                     class="select-success"
                     placeholder="Selecciona un estado"
                     label="Categoria"
@@ -359,12 +359,16 @@
         modal-classes="modal-dialog-centered modal-sm"
       >
         <card>
-          <form @submit.prevent="updateState">
+          <el-form
+            ref="formRef"
+            @submit.native.prevent="updateAsset(assetToUpdate)"
+            :model="assetToUpdate"
+          >
             <div class="row">
               <div class="col-md-12">
                 <base-input type="text" label="Estado">
                   <el-select
-                    v-model="asset.assetStateId"
+                    v-model="assetToUpdate.stateId"
                     class="select-success"
                     placeholder="Selecciona un estado"
                     label="Categoria"
@@ -380,8 +384,17 @@
                   </el-select>
                 </base-input>
               </div>
+              <div class="col-md-12">
+                <base-button
+                  native-type="submit"
+                  type="primary"
+                  class="btn-fill"
+                >
+                  Actualizar
+                </base-button>
+              </div>
             </div>
-          </form>
+          </el-form>
         </card>
       </modal>
     </div>
@@ -389,7 +402,14 @@
 </template>
 <script>
 import { BaseSwitch, Modal } from "@/components";
-import { Select, Option, Table, TableColumn, Pagination } from "element-ui";
+import {
+  Select,
+  Option,
+  Table,
+  TableColumn,
+  Pagination,
+  Form,
+} from "element-ui";
 
 export default {
   middleware: "authenticated",
@@ -399,6 +419,7 @@ export default {
     [Table.name]: Table,
     [TableColumn.name]: TableColumn,
     [Pagination.name]: Pagination,
+    [Form.name]: Form,
     BaseSwitch,
     Modal,
   },
@@ -446,7 +467,11 @@ export default {
       asset: {
         serial: null,
         modelId: null,
-        assetStateId: null,
+        stateId: null,
+      },
+      assetToUpdate: {
+        id: null,
+        stateId: null,
       },
     };
   },
@@ -471,6 +496,10 @@ export default {
     this.getBrands();
   },
   methods: {
+    showUpdateStateModal(id){
+      this.modals.updateAssetState = true;
+      this.assetToUpdate.id = id;
+    },
     handleSizeChange(val) {
       this.limit = val;
       this.getAssets();
@@ -632,19 +661,21 @@ export default {
         console.log(error);
       }
     },
-    async updateAsset() {
+    async updateAsset(form) {
       try {
-        const { assetStateId } = this.asset
-        const { data, error } = await this.$axios.patch(`/assets/${this.id}`, {assetStateId});
+        const { stateId, id } = this.assetToUpdate;
+        const { data, error } = await this.$axios.patch(`/assets/${id}`, {
+          stateId,
+        });
         this.$notify({
           message: `activo actualizado correctamente`,
           type: "success",
-        })
-        this.toUpdate = {}
-        this.getAsset();
-        this.modals.updateAsset = false
+        });
+        this.toUpdate = {};
+        this.getAssets();
+        this.modals.updateAsset = false;
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     },
   },

@@ -98,7 +98,7 @@
           <el-table-column label="Estado">
             <base-input type="text" slot-scope="{ row }">
               <el-select
-                v-model="row.target.assetStateId"
+                v-model="row.target.stateId"
                 class="select-success"
                 placeholder="Selecciona un estado"
                 label="Estados"
@@ -215,7 +215,7 @@ export default {
       const toSend = data.map((assignment) => {
         return {
           id: assignment.target.id,
-          assetStateId: assignment.target.assetStateId,
+          stateId: assignment.target.stateId,
         };
       });
       return {

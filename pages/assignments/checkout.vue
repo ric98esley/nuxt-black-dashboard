@@ -257,7 +257,7 @@ export default {
       const toSend = data.map((asset) => {
         return {
           id: asset.id,
-          assetStateId: this.assetState,
+          stateId: this.assetState,
         };
       });
       return toSend;
