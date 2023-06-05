@@ -3,101 +3,14 @@
     <div class="col-md-12">
       <card>
         <div class="row">
-          <div class="col-md-4">
+          <div class="col-md-10">
             <base-input label="Buscar activos" v-model="toSearchAssets">
             </base-input>
           </div>
-          <div class="col-md-2">
-            <base-input label="Tipo de asignacion" type="text">
-              <el-select
-                class="select-success"
-                filterable
-                style="width: 100%"
-                v-model="assignmentType"
-              >
-                <el-option key="user" value="user" label="Usuario"> </el-option>
-                <el-option key="location" value="location" label="Lugar">
-                </el-option>
-                <el-option key="Activo" value="asset" label="Activo">
-                </el-option>
-              </el-select>
-            </base-input>
-          </div>
-          <div class="col-md-2">
-            <base-input
-              label="Asignar a"
-              type="text"
-              v-if="assignmentType === 'user'"
-            >
-              <el-autocomplete
-                :trigger-on-focus="false"
-                clearable
-                v-model="target.name"
-                :fetch-suggestions="getUsers"
-                placeholder="Buscar usuario"
-                @select="handleSelect"
-              >
-                <template #default="{ item }">
-                  <div class="value">
-                    <b>{{ item.username }}</b
-                    >, <span class="link">{{ item.role }}</span>
-                  </div>
-                </template>
-              </el-autocomplete>
-            </base-input>
-            <base-input
-              label="Asignar a"
-              type="text"
-              v-if="assignmentType === 'location'"
-            >
-              <el-autocomplete
-                :trigger-on-focus="false"
-                clearable
-                v-model="target.name"
-                :fetch-suggestions="getLocations"
-                placeholder="Buscar lugar"
-                @select="handleSelect"
-              >
-                <template #default="{ item }">
-                  <div class="value">
-                    <b>{{ item.name }}</b
-                    >, <span class="link">{{ item.code }}</span>
-                  </div>
-                </template>
-              </el-autocomplete>
-            </base-input>
-          </div>
-          <div class="col-md-2">
-            <base-input type="text" label="Estado">
-              <el-select
-                v-model="assetState"
-                class="select-success"
-                placeholder="Selecciona un estado"
-                label="Estados"
-                style="width: 100%"
-                name="Estado de los activo"
-              >
-                <el-option
-                  v-for="option in states"
-                  :key="option.id"
-                  :value="option.id"
-                  :label="option.name"
-                >
-                </el-option>
-              </el-select>
-            </base-input>
-          </div>
-          <div class="col-md-2">
-            <base-input label="Guardar">
-              <base-button
-                type="primary"
-                native-type="button"
-                @click="createCheckout"
-                :disabled="!(assetsId.length > 0)"
-              >
-                Asignar
-              </base-button>
-            </base-input>
+          <div>
+            <base-button @click="modals.assignmentItems = true">
+              Asignar
+            </base-button>
           </div>
         </div>
       </card>
@@ -108,29 +21,24 @@
       <card>
         <el-table :data="assets.assets" class="table-striped">
           <el-table-column
-            min-width="110"
             sortable
             label="Serial"
             property="serial"
           ></el-table-column>
           <el-table-column
-            min-width="120"
             sortable
             label="Estado"
             property="state.name"
           ></el-table-column>
-          <el-table-column
-            min-width="100"
-            label="Modelo"
-            property="model.name"
-          ></el-table-column>
-          <el-table-column
-            min-width="100"
-            sortable
-            label="Tipo"
-            property="model.category.name"
-          ></el-table-column>
-          <el-table-column min-width="100" header-align="right" label="Agregar">
+          <el-table-column label="Descripción">
+            <template slot-scope="{ row }">
+              <div>
+                {{ row.model?.category.name }} - {{ row.model?.brand?.name }} -
+                {{ row.model.name }}
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column width="60" header-align="right">
             <div slot-scope="{ row }" class="text-right">
               <el-tooltip content="Agregar" :open-delay="300" placement="top">
                 <base-button
@@ -166,7 +74,13 @@
         </div>
         <el-table :data="assetsToAssignment" class="table-striped">
           <el-table-column label="Serial" property="serial"> </el-table-column>
-          <el-table-column label="Tipo" property="model.category.name">
+          <el-table-column label="Descripción">
+            <template slot-scope="{ row }">
+              <div>
+                {{ row.model?.category.name }} - {{ row.model?.brand?.name }} -
+                {{ row.model.name }}
+              </div>
+            </template>
           </el-table-column>
           <el-table-column min-width="100" header-align="right" label="Borrar">
             <div slot-scope="{ row }" class="text-right">
@@ -185,11 +99,147 @@
         </el-table>
       </card>
     </div>
+    <div>
+      <modal
+        :show.sync="modals.assignmentItems"
+        body-classes="p-0"
+        modal-classes="modal-dialog-centered modal-md"
+      >
+        <card>
+          <el-form>
+            <div class="col-md-12">
+              <base-input label="Tipo de asignacion" type="text">
+                <el-select
+                  class="select-success"
+                  filterable
+                  style="width: 100%"
+                  v-model="assignmentType"
+                >
+                  <el-option key="user" value="user" label="Usuario">
+                  </el-option>
+                  <el-option key="location" value="location" label="Lugar">
+                  </el-option>
+                  <el-option key="Activo" value="asset" label="Activo">
+                  </el-option>
+                </el-select>
+              </base-input>
+            </div>
+            <div class="col-md-12">
+              <base-input
+                label="Asignar a"
+                type="text"
+                v-if="assignmentType === 'user'"
+              >
+                <el-autocomplete
+                  :trigger-on-focus="false"
+                  clearable
+                  v-model="target.name"
+                  :fetch-suggestions="getUsers"
+                  placeholder="Buscar usuario"
+                  @select="handleSelect"
+                  class="w-100"
+                >
+                  <template #default="{ item }">
+                    <div class="value">
+                      <b>{{ item.username }}</b
+                      >, <span class="link">{{ item.role }}</span>
+                    </div>
+                  </template>
+                </el-autocomplete>
+              </base-input>
+              <base-input
+                label="Asignar a"
+                type="text"
+                v-if="assignmentType === 'asset'"
+              >
+                <el-autocomplete
+                  :trigger-on-focus="false"
+                  clearable
+                  v-model="target.serial"
+                  :fetch-suggestions="getAssetToAssigment"
+                  placeholder="Buscar activo"
+                  @select="handleSelect"
+                  class="w-100"
+                >
+                  <template #default="{ item }">
+                    <div class="value">
+                      <b>{{ item.serial }}</b
+                      >, <span class="link">{{ item.state.name }}</span>
+                    </div>
+                  </template>
+                </el-autocomplete>
+              </base-input>
+              <base-input
+                label="Asignar a"
+                type="text"
+                v-if="assignmentType === 'location'"
+              >
+                <el-autocomplete
+                  :trigger-on-focus="false"
+                  clearable
+                  v-model="target.name"
+                  :fetch-suggestions="getLocations"
+                  placeholder="Buscar lugar"
+                  @select="handleSelect"
+                  class="w-100"
+                >
+                  <template #default="{ item }">
+                    <div class="value">
+                      <b>{{ item.name }}</b
+                      >, <span class="link">{{ item.code }}</span>
+                    </div>
+                  </template>
+                </el-autocomplete>
+              </base-input>
+            </div>
+            <div class="col-md-12">
+              <base-input type="text" label="Estado">
+                <el-select
+                  v-model="assetState"
+                  class="select-success"
+                  placeholder="Selecciona un estado"
+                  label="Estados"
+                  style="width: 100%"
+                  name="Estado de los activo"
+                >
+                  <el-option
+                    v-for="option in states"
+                    :key="option.id"
+                    :value="option.id"
+                    :label="option.name"
+                  >
+                  </el-option>
+                </el-select>
+              </base-input>
+            </div>
+            <div class="col-md-2">
+              <base-input label="Guardar">
+                <base-button
+                  type="primary"
+                  native-type="button"
+                  @click="createCheckout"
+                  :disabled="!(assetsId.length > 0)"
+                >
+                  Asignar
+                </base-button>
+              </base-input>
+            </div>
+          </el-form>
+        </card>
+      </modal>
+    </div>
   </div>
 </template>
 
 <script>
-import { Select, Option, Table, TableColumn, Autocomplete } from "element-ui";
+import {
+  Select,
+  Option,
+  Table,
+  TableColumn,
+  Autocomplete,
+  Form,
+} from "element-ui";
 import { BaseSwitch, Modal } from "@/components";
 
 export default {
@@ -201,11 +251,15 @@ export default {
     [Table.name]: Table,
     [TableColumn.name]: TableColumn,
     [Autocomplete.name]: Autocomplete,
+    [Form.name]: Form,
     BaseSwitch,
     Modal,
   },
   data() {
     return {
+      modals: {
+        assignmentItems: false,
+      },
       assetState: null,
       assetsToAssignment: [],
       assignmentType: "",
@@ -278,6 +332,22 @@ export default {
         console.log(error);
       }
     },
+    async getAssetToAssigment(queryString, cb) {
+      try {
+        let toSend = {
+          params: {},
+        };
+
+        if (queryString.length > 2) {
+          toSend.params.serial = queryString;
+        }
+
+        const { data, error } = await this.$axios.get("/assets", toSend);
+        cb(data.assets);
+      } catch (error) {
+        console.log(error);
+      }
+    },
     async getLocations(queryString, cb) {
       const toSend = {
         params: {},
@@ -301,7 +371,7 @@ export default {
       try {
         let toSend = {
           params: {
-            state: 'desplegable'
+            state: "desplegable",
           },
         };
         if (this.toSearchAssets.length > 2) {
@@ -345,13 +415,20 @@ export default {
         return;
       }
       try {
-        const {data, error} = await this.$axios.post("/orders/checkout", toSend);
+        const { data, error } = await this.$axios.post(
+          "/orders/checkout",
+          toSend
+        );
         this.$notify({
           message: "Activos asignado correctamente",
           timeout: 3000,
           icon: "tim-icons icon-bell-55",
         });
-        window.open(`/assignments/print/${data.id}`, '_blank');
+        await this.getAssets();
+        if (this.assignmentType === "asset") {
+          return
+        }
+        window.open(`/assignments/print/${data.id}`, "_blank");
       } catch (error) {
         this.$notify({
           message: "Algo ocurrio mal",

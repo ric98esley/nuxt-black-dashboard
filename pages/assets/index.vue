@@ -3,10 +3,22 @@
     <div class="col-md-12">
       <h1>Activos</h1>
     </div>
-
-    <card class="col-md-12">
-      <base-input label="Buscar activo" v-model="search"></base-input>
-    </card>
+    <div class="col-12">
+      <card>
+        <div class="row">
+          <div class="col-11">
+            <base-input label="Buscar activo" v-model="search"></base-input>
+          </div>
+          <div class="col-1 row justify-content-center align-items-center">
+            <el-tooltip content="Filtrar" :open-delay="300" placement="top">
+              <base-button type="info" size="sm" icon>
+                <i class="fa fa-solid fa-filter"></i>
+              </base-button>
+            </el-tooltip>
+          </div>
+        </div>
+      </card>
+    </div>
     <!-- table -->
     <card class="col-md-9">
       <h4 slot="header" class="card-title">Lista de activos</h4>
@@ -496,7 +508,7 @@ export default {
     this.getBrands();
   },
   methods: {
-    showUpdateStateModal(id){
+    showUpdateStateModal(id) {
       this.modals.updateAssetState = true;
       this.assetToUpdate.id = id;
     },
