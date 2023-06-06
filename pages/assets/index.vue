@@ -11,7 +11,12 @@
           </div>
           <div class="col-1 row justify-content-center align-items-center">
             <el-tooltip content="Filtrar" :open-delay="300" placement="top">
-              <base-button type="info" size="sm" icon>
+              <base-button
+                type="info"
+                size="sm"
+                icon
+                @click="modals.filter = true"
+              >
                 <i class="fa fa-solid fa-filter"></i>
               </base-button>
             </el-tooltip>
@@ -154,8 +159,8 @@
                     v-model="asset.modelId"
                     filterable
                     class="select-success"
-                    placeholder="Selecciona una categoria"
-                    label="Categoria"
+                    placeholder="Selecciona una modelo"
+                    label="Modelo"
                     style="width: 100%"
                   >
                     <el-option
@@ -177,7 +182,7 @@
                     v-model="asset.stateId"
                     class="select-success"
                     placeholder="Selecciona un estado"
-                    label="Categoria"
+                    label="Estado"
                     style="width: 100%"
                   >
                     <el-option
@@ -224,9 +229,10 @@
                   <el-select
                     v-model="state.state"
                     class="select-success"
-                    placeholder="Selecciona una categoria"
-                    label="Categoria"
+                    placeholder="Selecciona una opcion"
+                    label="Estado"
                     style="width: 100%"
+                    filterable
                   >
                     <el-option
                       v-for="option in stateOptions"
@@ -365,6 +371,119 @@
           </form>
         </card>
       </modal>
+
+      <modal
+        :show.sync="modals.filter"
+        body-classes="p-0"
+        modal-classes="modal-dialog-centered modal-sm"
+      >
+        <card>
+          <el-form @submit.native.prevent>
+            <base-input label="Modelo">
+              <el-select
+                v-model="filters.modelId"
+                clearable
+                filterable
+                class="select-success"
+                placeholder="Selecciona una modelo"
+                label="Categoria"
+                style="width: 100%"
+              >
+                <el-option
+                  v-for="option in models"
+                  :key="option.id"
+                  :value="option.id"
+                  :label="`${option.category.name} - ${option.name} - ${option.brand?.name}`"
+                >
+                </el-option>
+              </el-select>
+            </base-input>
+            <base-input type="text" label="Categoria">
+              <el-select
+                v-model="filters.categoryId"
+                class="select-success"
+                placeholder="Selecciona una categoria"
+                label="Categoria"
+                style="width: 100%"
+                filterable
+              >
+                <el-option
+                  v-for="option in categories"
+                  :key="option.id"
+                  :value="option.id"
+                  :label="option.name"
+                >
+                </el-option>
+              </el-select>
+            </base-input>
+            <base-input type="text" label="Estado">
+              <el-select
+                v-model="filters.stateId"
+                class="select-success"
+                placeholder="Selecciona un estado"
+                label="Estado"
+                style="width: 100%"
+                filterable
+                clearable
+              >
+                <el-option
+                  v-for="option in states"
+                  :key="option.id"
+                  :value="option.id"
+                  :label="`${option.id} - ${option.name}`"
+                >
+                  {{ option.id }} - {{ option.name }}
+                </el-option>
+              </el-select>
+            </base-input>
+            <base-input type="text" label="Marca">
+              <el-select
+                v-model="filters.brandId"
+                class="select-success"
+                placeholder="Selecciona una marca"
+                filterable
+                label="Marca"
+                style="width: 100%"
+              >
+                <el-option
+                  v-for="option in brands"
+                  :key="option.id"
+                  :value="option.id"
+                  :label="option.name"
+                >
+                </el-option>
+              </el-select>
+            </base-input>
+            <base-input
+              label="Desde"
+            >
+              <el-date-picker
+                format="DD-MM-yyyy"
+                value-format="yyyy-MM-DD"
+                type="date"
+                class="bg-transparent"
+                size="large"
+                clearable
+                v-model="filters.startDate"
+              > </el-date-picker>
+            </base-input>
+            <base-input
+              label="Hasta"
+            >
+              <el-date-picker
+                format="DD-MM-yyyy"
+                value-format="yyyy-MM-DD"
+                type="date"
+                class="bg-transparent"
+                size="large"
+                clearable
+                v-model="filters.endDate"
+              > </el-date-picker>
+            </base-input>
+            <base-switch label="Mostrar borrados"> </base-switch>
+          </el-form>
+        </card>
+      </modal>
       <modal
         :show.sync="modals.updateAssetState"
         body-classes="p-0"
@@ -383,15 +502,16 @@
                     v-model="assetToUpdate.stateId"
                     class="select-success"
                     placeholder="Selecciona un estado"
-                    label="Categoria"
+                    label="Estado"
                     style="width: 100%"
+                    filterable
                   >
                     <el-option
                       v-for="option in states"
                       :key="option.id"
                       :value="option.id"
-                      :label="option.name"
                     >
+                      {{ option.id }} - {{ option.name }}
                     </el-option>
                   </el-select>
                 </base-input>
@@ -421,6 +541,7 @@ import {
   TableColumn,
   Pagination,
   Form,
+  DatePicker,
 } from "element-ui";
 
 export default {
@@ -432,14 +553,13 @@ export default {
     [TableColumn.name]: TableColumn,
     [Pagination.name]: Pagination,
     [Form.name]: Form,
+    [DatePicker.name]: DatePicker,
     BaseSwitch,
     Modal,
   },
   data() {
     return {
       currentPage: 1,
-      limit: 10,
-      offset: 0,
       search: "",
       modals: {
         createAsset: false,
@@ -448,6 +568,21 @@ export default {
         createModel: false,
         createBrand: false,
         updateAssetState: false,
+        filter: false,
+      },
+      filters: {
+        serial: null,
+        limit: 10,
+        offset: 0,
+        sort: null,
+        order: null,
+        all: null,
+        stateId: null,
+        modelId: null,
+        categoryId: null,
+        brandId: null,
+        startDate: null,
+        endDate: null,
       },
       assets: [],
       brands: [],
@@ -489,14 +624,19 @@ export default {
   },
   watch: {
     search(newState, lastState) {
-      if (newState === "") {
-        this.getAssets();
-        return;
-      }
-      if (newState.length < 3) return;
-
+      this.filters.serial = newState;
+      if (newState.length < 1) this.filters.serial = null;
       this.getAssets();
     },
+    filter() {
+      this.getAssets();
+    },
+  },
+  computed: {
+    filter() {
+      this.getAssets();
+      return this.filters;
+    }
   },
   beforeMount() {
     this.getAssets();
@@ -513,26 +653,22 @@ export default {
       this.assetToUpdate.id = id;
     },
     handleSizeChange(val) {
-      this.limit = val;
+      this.filters.limit = val;
       this.getAssets();
     },
     handleCurrentChange(val) {
-      this.offset = (val - 1) * this.limit;
-      console.log(this.offset);
+      this.filters.offset = (val - 1) * this.filters.limit;
       this.getAssets();
     },
     async getAssets() {
       try {
-        let toSend = {
-          params: {},
+        const params = { ...this.filters };
+        this.removeNullProps(params);
+        const toSend = {
+          params,
         };
-        if (this.search.length > 2) {
-          toSend.params.serial = this.search;
-        }
-        toSend.params.limit = this.limit;
-        toSend.params.offset = this.offset;
 
-        this.removeNullProps(toSend);
+        console.log(params);
         const { data, error } = await this.$axios.get("/assets", toSend);
         this.assets = data;
       } catch (error) {
@@ -573,7 +709,7 @@ export default {
     },
     removeNullProps(obj) {
       for (let prop in obj) {
-        if (obj[prop] === null) {
+        if (obj[prop] === null || obj[prop] === undefined || obj[prop] === "") {
           delete obj[prop];
         }
       }
@@ -696,6 +832,9 @@ export default {
 
 <style>
 .el-table__expanded-cell {
+  background-color: transparent;
+}
+.el-range-input {
   background-color: transparent;
 }
 </style>
