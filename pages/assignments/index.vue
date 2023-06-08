@@ -1,12 +1,23 @@
 <template>
   <div class="row">
-    <h1 class="col-md-12">Asignaciones</h1>
-    <!-- <card class="col-md-12">
+    <h1 class="col-md-12">Ordenes</h1>
+    <card class="col-md-12">
       <base-input label="Buscar assignacion"></base-input>
-    </card> -->
+    </card>
     <card class="col-md-9">
       <el-table :data="orders.orders" class="table-striped">
-        <el-table-column label="ticket" property="id"></el-table-column>
+        <el-table-column type="expand">
+          <template slot-scope="{ row }">
+            <p>
+              Creado por: {{ row.createdBy.name }}
+              {{ row.createdBy.lastName }}
+            </p>
+            <p>
+              Creado el : {{ new Date(row.createdAt).toLocaleString() }}
+            </p>
+          </template>
+        </el-table-column>
+        <el-table-column label="ticket" property="id"> </el-table-column>
         <el-table-column label="Orden de">
           <div slot-scope="{ row }">
             <p v-if="row.transactionType === 'checkout'">Salida</p>
@@ -17,6 +28,7 @@
           <div slot-scope="{ row }">
             <p v-if="row.assignmentType === 'user'">Usuario</p>
             <p v-if="row.assignmentType === 'location'">Lugar</p>
+            <p v-if="row.assignmentType === 'asset'">Activo</p>
           </div>
         </el-table-column>
         <el-table-column label="Código" property="user.username">
@@ -24,6 +36,9 @@
             <p v-if="row.assignmentType === 'user'">{{ row.user.username }}</p>
             <p v-if="row.assignmentType === 'location'">
               {{ row.location.code }}
+            </p>
+            <p v-if="row.assignmentType === 'asset'">
+              {{ row.asset.serial }}
             </p>
           </div>
         </el-table-column>
@@ -53,7 +68,6 @@
                 <i class="fa fa-regular fa-pen"></i>
               </base-button>
             </el-tooltip>
-
           </div>
         </el-table-column>
       </el-table>
@@ -123,7 +137,7 @@
               <div>Telefono: 027631234114</div>
             </div>
             <div class="col-md-6">
-              <h4>Datos de la asignación</h4>
+              <h4>Datos de la orden</h4>
               <template v-if="order.assignmentType === 'user'">
                 Asignado A: {{ order.user.name }} {{ order.user.lastName }}
               </template>
@@ -138,7 +152,7 @@
                 Asignado por: {{ order.createdBy?.name }}
                 {{ order.createdBy?.lastName }}
               </div>
-              <div>Asignado el: {{ formatDate(order.createdAt) }}</div>
+              <div>Asignado el: {{ new Date(order.createdAt).toLocaleString() }}</div>
             </div>
           </div>
           <div class="row p-3">
@@ -165,9 +179,8 @@
           <div class="p-3">
             <base-button link>
               <router-link
-                :to="{path:`/assignments/print/${order.id}`}"
+                :to="{ path: `/assignments/print/${order.id}` }"
                 target="_blank"
-
               >
                 Imprimir</router-link
               >

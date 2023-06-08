@@ -34,7 +34,9 @@
               Creado por: {{ props.row.createdBy.name }}
               {{ props.row.createdBy.lastName }}
             </p>
-            <p>Creado el : {{ props.row.createdAt }}</p>
+            <p>
+              Creado el : {{ new Date(props.row.createdAt).toLocaleString() }}
+            </p>
           </template>
         </el-table-column>
         <el-table-column sortable label="Serial" property="serial">
@@ -454,31 +456,16 @@
                 </el-option>
               </el-select>
             </base-input>
-            <base-input
-              label="Desde"
-            >
+            <base-input label="Desde">
               <el-date-picker
-                format="DD-MM-yyyy"
-                value-format="yyyy-MM-DD"
-                type="date"
+                type="daterange"
                 class="bg-transparent"
                 size="large"
                 clearable
-                v-model="filters.startDate"
-              > </el-date-picker>
-            </base-input>
-            <base-input
-              label="Hasta"
-            >
-              <el-date-picker
-                format="DD-MM-yyyy"
-                value-format="yyyy-MM-DD"
-                type="date"
-                class="bg-transparent"
-                size="large"
-                clearable
-                v-model="filters.endDate"
-              > </el-date-picker>
+                v-model="dateFilter"
+                @change="updateDateFilter"
+              >
+              </el-date-picker>
             </base-input>
             <base-switch label="Mostrar borrados"> </base-switch>
           </el-form>
@@ -570,6 +557,7 @@ export default {
         updateAssetState: false,
         filter: false,
       },
+      dateFilter: null,
       filters: {
         serial: null,
         limit: 10,
@@ -636,7 +624,7 @@ export default {
     filter() {
       this.getAssets();
       return this.filters;
-    }
+    },
   },
   beforeMount() {
     this.getAssets();
@@ -648,6 +636,19 @@ export default {
     this.getBrands();
   },
   methods: {
+    updateDateFilter() {
+      if (
+        this.dateFilter === null ||
+        this.dateFilter === undefined ||
+        this.dateFilter === ""
+      ) {
+        this.filters.startDate = null;
+        this.filters.endDate = null;
+        return
+      }
+      this.filters.startDate = this.dateFilter[0];
+      this.filters.endDate = this.dateFilter[1];
+    },
     showUpdateStateModal(id) {
       this.modals.updateAssetState = true;
       this.assetToUpdate.id = id;

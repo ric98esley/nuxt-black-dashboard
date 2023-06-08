@@ -16,27 +16,27 @@
     </div>
     <br />
     <div class="d-flex d-flex justify-content-between">
-              <div class="col-3">
-          <strong>Datos de la asignación</strong>
-          <br />
-          {{
-            order.transactionType == "checkout"
-              ? "Reporte de salida"
-              : "Reporte de entrada"
-          }}
-          <br />
-          Fecha de impresion: {{ new Date().toLocaleString() }} <br />
-          Creado el: {{ new Date(order.createdAt).toLocaleString() }} <br />
-          Realizado por:
-          <b> {{ order.createdBy?.name }} {{ order.createdBy?.lastName }} </b>
-        </div>
+      <div class="col-3">
+        <strong>Datos de la orden</strong>
+        <br />
+        {{
+          order.transactionType == "checkout"
+            ? "Reporte de salida"
+            : "Reporte de entrada"
+        }}
+        <br />
+        Fecha de impresion: {{ new Date().toLocaleString() }} <br />
+        Creado el: {{ new Date(order.createdAt).toLocaleString() }} <br />
+        Realizado por:
+        <b> {{ order.createdBy?.name }} {{ order.createdBy?.lastName }} </b>
+      </div>
       <template v-if="order.assignmentType == 'user'">
         <div class="col-8">
-          <strong>Datos de {{ order.user?.username}}</strong> <br>
-          {{ order.user?.name }} {{ order.user?.lastName }} <br>
-          <b>Teléfono:</b> {{ order.user?.phone }} <br>
-          <b>Email:</b> {{ order.user?.email}} <br>
-          <b>Cedula:</b> {{order.user?.cardId}}
+          <strong>Datos de {{ order.user?.username }}</strong> <br />
+          {{ order.user?.name }} {{ order.user?.lastName }} <br />
+          <b>Teléfono:</b> {{ order.user?.phone }} <br />
+          <b>Email:</b> {{ order.user?.email }} <br />
+          <b>Cedula:</b> {{ order.user?.cardId }}
         </div>
       </template>
       <template v-if="order.assignmentType == 'location'">
@@ -66,15 +66,38 @@
         <th>Fecha</th>
         <th>Serial</th>
         <th>Descripción</th>
+        <template v-if="order.transactionType == 'checking'">
+          <th>Lugar</th>
+        </template>
       </tr>
       <tr v-for="(assignment, index) in order.assignments" v-bind:key="index">
         <td>{{ index + 1 }}</td>
-        <td>{{ new Date(assignment.checkoutAt).toLocaleString()}}</td>
+        <td>{{ new Date(assignment.checkoutAt).toLocaleString() }}</td>
         <td>{{ assignment.target?.serial }}</td>
         <td>
           {{ assignment.target.model.category.name }} -
           {{ assignment.target.model?.brand?.name }} -
           {{ assignment.target.model.name }}
+        </td>
+        <td v-if="order.transactionType == 'checking'">
+          <template v-if="assignment.user">
+              <b>
+                {{ assignment.user?.username }}
+              </b> -
+              {{ assignment.user?.name }} {{ assignment.user?.lastName }}
+          </template>
+          <template v-if="assignment.location">
+            <b>
+              {{ assignment.location?.code }}
+            </b> -
+            {{ assignment.location?.name }}
+          </template>
+          <template v-if="assignment.asset">
+            <b>
+              Serial:
+            </b>
+              {{ assignment.asset?.serial }}
+          </template>
         </td>
       </tr>
       <tr>
@@ -115,7 +138,8 @@ export default {
     };
   },
   mounted() {
-    this.getOrder().then(() => {
+    this.getOrder()
+    .then(() => {
       window.print();
       setTimeout(window.close, 500);
     });
@@ -140,7 +164,6 @@ export default {
     },
     async getOrder() {
       try {
-        console.log("adfadf");
         const { data, error } = await this.$axios.get(`/orders/${this.id}`);
         this.order = data;
         console.log(this.order);
