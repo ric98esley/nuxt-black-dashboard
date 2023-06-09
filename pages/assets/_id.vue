@@ -158,15 +158,16 @@
                     v-model="toUpdate.stateId"
                     class="select-success"
                     placeholder="Selecciona un estado"
-                    label="Categoria"
+                    label="Estado"
                     style="width: 100%"
+                    filterable
                   >
                     <el-option
                       v-for="option in states"
                       :key="option.id"
                       :value="option.id"
-                      :label="option.name"
                     >
+                      {{ option.id }} - {{ option.name }}
                     </el-option>
                   </el-select>
                 </base-input>
@@ -207,8 +208,7 @@ export default {
       modals: {
         updateAsset: false,
       },
-      toUpdate: {
-      },
+      toUpdate: {},
       states: [],
       models: [],
     };
@@ -241,9 +241,7 @@ export default {
       return fechaFormateada;
     },
     async getAsset() {
-      const { data } = await this.$axios.get(
-        `/assets/${this.id}`
-      );
+      const { data } = await this.$axios.get(`/assets/${this.id}`);
       this.asset = data;
     },
     async getStatus() {
@@ -264,17 +262,20 @@ export default {
     },
     async updateAsset() {
       try {
-        const toSend = {...this.toUpdate}
-        const { data, error } = await this.$axios.patch(`/assets/${this.id}`, toSend);
+        const toSend = { ...this.toUpdate };
+        const { data, error } = await this.$axios.patch(
+          `/assets/${this.id}`,
+          toSend
+        );
         this.$notify({
           message: `activo actualizado correctamente`,
           type: "success",
-        })
-        this.toUpdate = {}
+        });
+        this.toUpdate = {};
         this.getAsset();
-        this.modals.updateAsset = false
+        this.modals.updateAsset = false;
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     },
   },

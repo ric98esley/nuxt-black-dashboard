@@ -206,8 +206,9 @@
                     v-for="option in states"
                     :key="option.id"
                     :value="option.id"
-                    :label="option.name"
+                    :label="`${option.id} - ${option.name}`"
                   >
+                    {{ option.id }} - {{ option.name }}
                   </el-option>
                 </el-select>
               </base-input>
@@ -425,13 +426,14 @@ export default {
           icon: "tim-icons icon-bell-55",
         });
         await this.getAssets();
+        this.assetsToAssignment = [];
         if (this.assignmentType === "asset") {
-          return
+          return;
         }
         window.open(`/assignments/print/${data.id}`, "_blank");
       } catch (error) {
         this.$notify({
-          message: "Algo ocurrio mal",
+          message: "algo salío mal",
           timeout: 3000,
           icon: "tim-icons icon-bell-55",
         });

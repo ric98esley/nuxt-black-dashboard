@@ -109,8 +109,9 @@
                   v-for="option in states"
                   :key="option.id"
                   :value="option.id"
-                  :label="option.name"
+                  :label="`${option.id} - ${option.name}`"
                 >
+                  {{ option.id }} - {{ option.name }}
                 </el-option>
               </el-select>
             </base-input>
@@ -147,7 +148,7 @@ export default {
     [Select.name]: Select,
     [Table.name]: Table,
     [TableColumn.name]: TableColumn,
-    [Pagination.name]: Pagination
+    [Pagination.name]: Pagination,
   },
   data() {
     return {
@@ -277,7 +278,7 @@ export default {
         this.assetsToChecking = [];
       } catch (error) {
         this.$notify({
-          message: "Algo ocurrio mal, verifica los activos recibidos",
+          message: "algo salío mal, verifica los activos recibidos",
           timeout: 3000,
           icon: "tim-icons icon-bell-55",
         });

@@ -103,7 +103,7 @@
       <tr>
         <th colspan="4">
           <b>
-            Cantidad de activos asignados: {{ order.assignments?.length }}
+            Cantidad de activos asignados: {{ order.assigned?.total }}
           </b>
         </th>
       </tr>

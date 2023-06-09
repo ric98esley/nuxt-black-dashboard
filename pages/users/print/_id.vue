@@ -17,9 +17,7 @@
     <br />
     <div class="row justify-content-between">
       <div class="col-3">
-        <strong>Datos de la asignación</strong>
-        <br />
-        Reporte de inventario
+        <strong>        Reporte de inventario</strong>
         <br />
         Fecha de impresion: {{ new Date().toLocaleString() }} <br />
       </div>
@@ -39,7 +37,7 @@
         <th>Serial</th>
         <th>Descripción</th>
       </tr>
-      <tr v-for="(assignment, index) in user.assignments" v-bind:key="index">
+      <tr v-for="(assignment, index) in assigned.rows" v-bind:key="index">
         <td>{{ index + 1 }}</td>
         <td>{{ new Date(assignment.checkoutAt).toLocaleString() }}</td>
         <td>{{ assignment.target?.serial }}</td>
@@ -51,7 +49,7 @@
       </tr>
       <tr>
         <th colspan="4">
-          <b> Cantidad de activos asignados: {{ user.assignments?.length }} </b>
+          <b> Cantidad de activos asignados: {{ assigned.total }} </b>
         </th>
       </tr>
     </table>
@@ -81,6 +79,7 @@ export default {
     return {
       id: this.$route.params.id,
       user: {},
+      assigned: {},
       logo: "/img/logo.png",
     };
   },
@@ -93,9 +92,9 @@ export default {
   methods: {
     async getUser() {
       try {
-        const { data, error } = await this.$axios.get(`/users/${this.id}`);
-        this.user = data;
-        console.log(data);
+        const { data, error } = await this.$axios.get(`/users/${this.id}/assets`);
+        this.user = data.target;
+        this.assigned = data.assigned;
       } catch (error) {
         console.log(error);
       }

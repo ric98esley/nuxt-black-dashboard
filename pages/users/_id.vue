@@ -7,7 +7,7 @@
           <div class="row">
             <div class="col-md-6">
               <label>Nombre:</label>
-              {{ user?.name }}  {{ user?.lastName }}
+              {{ user?.name }} {{ user?.lastName }}
             </div>
             <div class="col-md-6">
               <label> Cedula:</label>
@@ -36,15 +36,12 @@
     <div class="col-md-6">
       <card>
         <div class="row justify-content-between mr-3 ml-3">
-          <h4>Asignaciones actuales</h4>
-          <nuxt-link
-            :to="{ path: `/users/print/${user.id}` }"
-            target="_blank"
-          >
+          <h4>Asignaciones actuales: {{ assigned.total }}</h4>
+          <nuxt-link :to="{ path: `/users/print/${user.id}` }" target="_blank">
             Imprimir
           </nuxt-link>
         </div>
-        <el-table :data="user?.assignments">
+        <el-table :data="assigned?.rows">
           <el-table-column type="expand">
             <template slot-scope="{ row }">
               <div class="row">
@@ -52,19 +49,15 @@
                   <p>Asignado el: {{ row.checkoutAt }}</p>
                   <p>
                     Asignado por:
-                    <router-link to="/">
                       {{ row.checkoutBy.name }}
-                      {{ row.checkoutBy.lastName }}</router-link
-                    >
+                      {{ row.checkoutBy.lastName }}
                   </p>
                 </div>
                 <div class="col-12" v-if="row.checkingAt">
                   <p>Recibido el: {{ row.checkingAt }}</p>
                   Recibido por:
-                  <router-link to="#">
                     {{ row.checkingBy.name }}
                     {{ row.checkingBy.lastName }}
-                  </router-link>
                 </div>
               </div>
             </template>
@@ -136,8 +129,7 @@
       </card>
     </div>
     <!-- Modals -->
-    <div>
-    </div>
+    <div></div>
   </div>
 </template>
 
@@ -172,6 +164,7 @@ export default {
       modals: {
         updateUser: false,
       },
+      assigned: {},
       user: {
         username: null,
         name: null,
@@ -181,22 +174,21 @@ export default {
         phone: null,
         cardId: null,
         address: null,
-        role: null
+        role: null,
       },
     };
   },
   mounted() {
     this.getUser();
   },
-  computed: {
-  },
-  watch: {
-  },
+  computed: {},
+  watch: {},
   methods: {
     async getUser() {
       try {
-        const { data } = await this.$axios.get(`/users/${this.id}`);
-        this.user = data;
+        const { data } = await this.$axios.get(`/users/${this.id}/assets`);
+        this.user = data.target;
+        this.assigned = data.assigned;
       } catch (error) {
         console.log(error);
       }

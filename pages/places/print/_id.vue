@@ -16,33 +16,29 @@
     </div>
     <br />
     <div class="d-flex d-flex justify-content-between">
-        <div class="col-3">
-          <strong>Datos de la asignación</strong>
-          <br />
-          Reporte de inventario
-          <br />
-          Fecha de impresion: {{ new Date().toLocaleString() }} <br />
-          Creado el: {{ new Date(location.createdAt).toLocaleString() }} <br />
-          Realizado por:
-          <b> {{ location.createdBy?.name }} {{ location.createdBy?.lastName }} </b>
-        </div>
-        <div class="col-5">
-          <strong>Datos de la {{ location.type?.name }}</strong> <br />
-          {{ location.code }} - {{ location?.name }} | Grupo:
-          {{ location.group?.code }} - {{ location.group?.name }}
-          <br />
-          Dirección: <b> {{ location.address }} </b><br />
-          Numero de la {{ location.type?.name }}:
-          <b> {{ location?.phone }}</b>
-        </div>
-        <div class="col-3">
-          <strong>
-            Datos del responsable de la
-            {{ location.type?.name }}: </strong
-          ><br />
-          Nombre: <b> {{ location.manager?.name }}</b> <br />
-          Teléfono: <b>{{ location.manager?.phone }}</b> <br />
-        </div>
+      <div class="col-3">
+        <strong> Reporte de inventario</strong>
+
+        <br />
+        Fecha de impresion: {{ new Date().toLocaleString() }} <br />
+      </div>
+      <div class="col-5">
+        <strong>Datos de la {{ location.type?.name }}</strong> <br />
+        {{ location.code }} - {{ location?.name }} | Grupo:
+        {{ location.group?.code }} - {{ location.group?.name }}
+        <br />
+        Dirección: <b> {{ location.address }} </b><br />
+        Numero de la {{ location.type?.name }}:
+        <b> {{ location?.phone }}</b>
+      </div>
+      <div class="col-3">
+        <strong>
+          Datos del responsable de la
+          {{ location.type?.name }}: </strong
+        ><br />
+        Nombre: <b> {{ location.manager?.name }}</b> <br />
+        Teléfono: <b>{{ location.manager?.phone }}</b> <br />
+      </div>
     </div>
     <br /><br />
     <table class="w-100 table-print">
@@ -52,9 +48,9 @@
         <th>Serial</th>
         <th>Descripción</th>
       </tr>
-      <tr v-for="(assignment, index) in location.assignments" v-bind:key="index">
+      <tr v-for="(assignment, index) in assigned.rows" v-bind:key="index">
         <td>{{ index + 1 }}</td>
-        <td>{{ new Date(assignment.checkoutAt).toLocaleString()}}</td>
+        <td>{{ new Date(assignment.checkoutAt).toLocaleString() }}</td>
         <td>{{ assignment.target?.serial }}</td>
         <td>
           {{ assignment.target?.model.category.name }} -
@@ -64,9 +60,7 @@
       </tr>
       <tr>
         <th colspan="4">
-          <b>
-            Cantidad de activos asignados: {{ location.assignments?.length }}
-          </b>
+          <b> Cantidad de activos asignados: {{ assigned.total }} </b>
         </th>
       </tr>
     </table>
@@ -96,25 +90,24 @@ export default {
     return {
       id: this.$route.params.id,
       location: {
-        name: null
+        name: null,
       },
+      assigned: {},
       logo: "/img/logo.png",
     };
   },
   mounted() {
-    this.getLocation().then(() => {
+    this.getAssigned().then(() => {
       window.print();
       setTimeout(window.close, 500);
     });
   },
   methods: {
-
-    async getLocation() {
+    async getAssigned() {
       try {
-        console.log("adfadf");
-        const { data, error } = await this.$axios.get(`/locations/${this.id}`);
-        this.location = data;
-        console.log(this.location);
+        const { data } = await this.$axios.get(`/locations/${this.id}/assets`);
+        this.assigned = data.assigned;
+        this.location = data.target;
       } catch (error) {
         console.log(error);
       }

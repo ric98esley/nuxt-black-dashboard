@@ -36,7 +36,7 @@
     <div class="col-md-6">
       <card>
         <div class="row justify-content-between mr-3 ml-3">
-          <h4>Asignaciones actuales</h4>
+          <h4>Asignaciones actuales: {{ assigned.total}}</h4>
           <nuxt-link
             :to="{ path: `/places/print/${location.id}` }"
             target="_blank"
@@ -44,7 +44,7 @@
             Imprimir
           </nuxt-link>
         </div>
-        <el-table :data="location?.assignments">
+        <el-table :data="assigned?.rows">
           <el-table-column type="expand">
             <template slot-scope="{ row }">
               <div class="row">
@@ -52,19 +52,9 @@
                   <p>Asignado el: {{ row.checkoutAt }}</p>
                   <p>
                     Asignado por:
-                    <router-link to="/">
                       {{ row.checkoutBy.name }}
-                      {{ row.checkoutBy.lastName }}</router-link
-                    >
+                      {{ row.checkoutBy.lastName }}
                   </p>
-                </div>
-                <div class="col-12" v-if="row.checkingAt">
-                  <p>Recibido el: {{ row.checkingAt }}</p>
-                  Recibido por:
-                  <router-link to="#">
-                    {{ row.checkingBy.name }}
-                    {{ row.checkingBy.lastName }}
-                  </router-link>
                 </div>
               </div>
             </template>
@@ -341,6 +331,7 @@ export default {
         zoneId: null,
         address: null,
       },
+      assigned: {},
       parent: {},
       manager: {},
       group: {},
@@ -350,7 +341,7 @@ export default {
     };
   },
   mounted() {
-    this.getLocation();
+    this.getAssigned();
     this.getZones();
     this.getLocationType();
   },
@@ -424,6 +415,15 @@ export default {
       try {
         const { data } = await this.$axios.get(`/locations/${this.id}`);
         this.location = data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async getAssigned() {
+      try {
+        const { data } = await this.$axios.get(`/locations/${this.id}/assets`);
+        this.assigned = data.assigned;
+        this.location = data.target;
       } catch (error) {
         console.log(error);
       }

@@ -186,13 +186,15 @@
                     placeholder="Selecciona un estado"
                     label="Estado"
                     style="width: 100%"
+                    filterable
                   >
                     <el-option
                       v-for="option in states"
                       :key="option.id"
                       :value="option.id"
-                      :label="option.name"
+                      :label="`${option.id} - ${option.name}`"
                     >
+                      {{ option.id }} - {{ option.name }}
                     </el-option>
                   </el-select>
                 </base-input>
@@ -497,6 +499,7 @@
                       v-for="option in states"
                       :key="option.id"
                       :value="option.id"
+                      :label="`${option.id} - ${option.name}`"
                     >
                       {{ option.id }} - {{ option.name }}
                     </el-option>
@@ -644,7 +647,7 @@ export default {
       ) {
         this.filters.startDate = null;
         this.filters.endDate = null;
-        return
+        return;
       }
       this.filters.startDate = this.dateFilter[0];
       this.filters.endDate = this.dateFilter[1];
