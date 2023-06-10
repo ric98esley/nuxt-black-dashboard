@@ -1,9 +1,29 @@
 <template>
   <div class="row">
-    <h1 class="col-md-12">Ordenes</h1>
-    <card class="col-md-12">
-      <base-input label="Buscar assignacion"></base-input>
-    </card>
+    <div class="col-md-12">
+      <h1>Ordenes</h1>
+    </div>
+    <div class="col-12">
+      <card>
+        <div class="row">
+          <div class="col-11">
+            <base-input label="Buscar activo" v-model="search"></base-input>
+          </div>
+          <div class="col-1 row justify-content-center align-items-center">
+            <el-tooltip content="Filtrar" :open-delay="300" placement="top">
+              <base-button
+                type="info"
+                size="sm"
+                icon
+                @click="modals.filter = true"
+              >
+                <i class="fa fa-solid fa-filter"></i>
+              </base-button>
+            </el-tooltip>
+          </div>
+        </div>
+      </card>
+    </div>
     <card class="col-md-9">
       <el-table :data="orders.orders" class="table-striped">
         <el-table-column type="expand">
@@ -12,9 +32,7 @@
               Creado por: {{ row.createdBy.name }}
               {{ row.createdBy.lastName }}
             </p>
-            <p>
-              Creado el : {{ new Date(row.createdAt).toLocaleString() }}
-            </p>
+            <p>Creado el : {{ new Date(row.createdAt).toLocaleString() }}</p>
           </template>
         </el-table-column>
         <el-table-column label="ticket" property="id"> </el-table-column>
@@ -124,6 +142,103 @@
     <!-- modasl -->
     <div>
       <modal
+        :show.sync="modals.filter"
+        body-classes="p-0"
+        modal-classes="modal-dialog-centered modal-sm"
+      >
+        <card>
+          <el-form @submit.native.prevent>
+            <base-input label="Modelo">
+              <el-select
+                v-model="filters.modelId"
+                clearable
+                filterable
+                class="select-success"
+                placeholder="Selecciona una modelo"
+                label="Categoria"
+                style="width: 100%"
+              >
+                <el-option
+                  v-for="option in models"
+                  :key="option.id"
+                  :value="option.id"
+                  :label="`${option.category.name} - ${option.name} - ${option.brand?.name}`"
+                >
+                </el-option>
+              </el-select>
+            </base-input>
+            <base-input type="text" label="Categoria">
+              <el-select
+                v-model="filters.categoryId"
+                class="select-success"
+                placeholder="Selecciona una categoria"
+                label="Categoria"
+                style="width: 100%"
+                filterable
+              >
+                <el-option
+                  v-for="option in categories"
+                  :key="option.id"
+                  :value="option.id"
+                  :label="option.name"
+                >
+                </el-option>
+              </el-select>
+            </base-input>
+            <base-input type="text" label="Estado">
+              <el-select
+                v-model="filters.stateId"
+                class="select-success"
+                placeholder="Selecciona un estado"
+                label="Estado"
+                style="width: 100%"
+                filterable
+                clearable
+              >
+                <el-option
+                  v-for="option in states"
+                  :key="option.id"
+                  :value="option.id"
+                  :label="`${option.id} - ${option.name}`"
+                >
+                  {{ option.id }} - {{ option.name }}
+                </el-option>
+              </el-select>
+            </base-input>
+            <base-input type="text" label="Marca">
+              <el-select
+                v-model="filters.brandId"
+                class="select-success"
+                placeholder="Selecciona una marca"
+                filterable
+                label="Marca"
+                style="width: 100%"
+              >
+                <el-option
+                  v-for="option in brands"
+                  :key="option.id"
+                  :value="option.id"
+                  :label="option.name"
+                >
+                </el-option>
+              </el-select>
+            </base-input>
+            <base-input label="Desde">
+              <el-date-picker
+                type="daterange"
+                class="bg-transparent"
+                size="large"
+                clearable
+                v-model="dateFilter"
+                @change="updateDateFilter"
+              >
+              </el-date-picker>
+            </base-input>
+            <base-switch label="Mostrar borrados"> </base-switch>
+          </el-form>
+        </card>
+      </modal>
+      <modal
         :show.sync="modals.viewOrder"
         body-classes="p-0"
         modal-classes="modal-dialog-centered modal-lg"
@@ -152,7 +267,9 @@
                 Asignado por: {{ order.createdBy?.name }}
                 {{ order.createdBy?.lastName }}
               </div>
-              <div>Asignado el: {{ new Date(order.createdAt).toLocaleString() }}</div>
+              <div>
+                Asignado el: {{ new Date(order.createdAt).toLocaleString() }}
+              </div>
             </div>
           </div>
           <div class="row p-3">
@@ -194,7 +311,15 @@
 
 <script>
 import { BaseSwitch, Modal } from "@/components";
-import { Select, Option, Table, TableColumn, Pagination } from "element-ui";
+import {
+  Select,
+  Option,
+  Table,
+  TableColumn,
+  Pagination,
+  Form,
+  DatePicker,
+} from "element-ui";
 
 export default {
   middleware: "authenticated",
@@ -205,6 +330,8 @@ export default {
     [Table.name]: Table,
     [TableColumn.name]: TableColumn,
     [Pagination.name]: Pagination,
+    [Form.name]: Form,
+    [DatePicker.name]: DatePicker,
     BaseSwitch,
     Modal,
   },
@@ -212,18 +339,41 @@ export default {
     return {
       modals: {
         viewOrder: false,
+        filter: false,
       },
+      filters: {},
       orders: [],
+      dateFilter: null,
+      search: null,
       limit: 10,
       offset: 0,
       currentPage: 1,
       order: {},
     };
   },
+  computed: {
+    filter() {
+      this.getAssignments();
+      return this.filters;
+    },
+  },
   mounted() {
     this.getAssignments();
   },
   methods: {
+    updateDateFilter() {
+      if (
+        this.dateFilter === null ||
+        this.dateFilter === undefined ||
+        this.dateFilter === ""
+      ) {
+        this.filters.startDate = null;
+        this.filters.endDate = null;
+        return;
+      }
+      this.filters.startDate = this.dateFilter[0];
+      this.filters.endDate = this.dateFilter[1];
+    },
     handleSizeChange(val) {
       this.limit = val;
       this.getAssignments();
@@ -231,23 +381,6 @@ export default {
     handleCurrentChange(val) {
       this.offset = (val - 1) * this.limit;
       this.getAssignments();
-    },
-    formatDate(dateString) {
-      // Crear un objeto de fecha a partir de la cadena de fecha
-
-      const fecha = new Date(dateString);
-
-      // Obtener el año, mes y día en formato de número
-      const year = fecha.getFullYear();
-      const month = fecha.getMonth() + 1;
-      const day = fecha.getDate();
-
-      // Crear un string con la fecha en formato "yyyy-mm-dd"
-      const fechaFormateada = `${year}-${month
-        .toString()
-        .padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
-
-      return fechaFormateada;
     },
     async getOrder(id) {
       try {
