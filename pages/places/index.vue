@@ -10,35 +10,26 @@
     <div class="col-md-9">
       <card>
         <el-table :data="locations.locations" class="table-striped">
-          <el-table-column
-            min-width="150"
-            sortable
-            label="Nombre"
-            property="name"
-          >
+          <el-table-column type="expand">
+            <div slot-scope="{ row }">
+              Responsable: {{ row.manager?.username }} <br />
+              Creada el: {{ new Date(row.createdAt).toLocaleString() }} <br />
+              Dirección: {{ row.address }}
+            </div>
           </el-table-column>
-          <el-table-column
-            min-width="150"
-            sortable
-            label="Codigo"
-            property="code"
-          >
+          <el-table-column sortable label="Nombre" property="name">
           </el-table-column>
-          <el-table-column
-            min-width="150"
-            sortable
-            label="Dirección"
-            property="address"
-          >
+          <el-table-column sortable label="Grupo">
+            <div slot-scope="{ row }">
+              {{ row.group?.code }} <br />
+              {{ row.group?.name }}
+            </div>
           </el-table-column>
-          <el-table-column
-            min-width="150"
-            sortable
-            label="Zona"
-            property="zone.zoneName"
-          >
+          <el-table-column sortable label="Codigo" property="code">
           </el-table-column>
-          <el-table-column header-align="right" >
+          <el-table-column sortable label="Zona" property="zone.zoneName">
+          </el-table-column>
+          <el-table-column header-align="right" width="70">
             <div slot-scope="{ row }" class="text-right">
               <el-tooltip
                 content="Información"
