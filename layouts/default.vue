@@ -11,7 +11,7 @@
           :link="{
             name: $t('sidebar.dashboard'),
             icon: 'tim-icons icon-chart-pie-36',
-            path: '/google'
+            path: '/google',
           }"
         >
         </sidebar-item>
@@ -19,7 +19,7 @@
           :link="{
             name: $t('sidebar.notifications'),
             icon: 'tim-icons icon-bell-55',
-            path: '/notifications'
+            path: '/notifications',
           }"
         >
         </sidebar-item>
@@ -27,7 +27,7 @@
           :link="{
             name: 'Usuarios',
             icon: 'tim-icons icon-badge',
-            path: '/users'
+            path: '/users',
           }"
         >
         </sidebar-item>
@@ -35,7 +35,7 @@
           :link="{
             name: 'Activos',
             icon: 'tim-icons icon-app',
-            path: '/assets'
+            path: '/assets',
           }"
         >
         </sidebar-item>
@@ -43,7 +43,7 @@
           :link="{
             name: 'Asignaciones',
             icon: 'tim-icons icon-notes',
-            path: '/assignments'
+            path: '/assignments',
           }"
         >
         </sidebar-item>
@@ -51,7 +51,7 @@
           :link="{
             name: 'Lugares',
             icon: 'tim-icons icon-square-pin',
-            path: '/places'
+            path: '/places',
           }"
         >
         </sidebar-item>
@@ -59,11 +59,18 @@
           :link="{
             name: 'Grupos',
             icon: 'tim-icons icon-vector  ',
-            path: '/groups'
+            path: '/groups',
           }"
         >
         </sidebar-item>
-
+        <sidebar-item
+          :link="{
+            name: 'Auditorias',
+            icon: 'tim-icons icon-paper  ',
+            path: '/audits',
+          }"
+        >
+        </sidebar-item>
       </template>
     </side-bar>
     <!--Share plugin (for demo purposes). You can remove it if don't plan on using it-->
@@ -71,10 +78,7 @@
       <dashboard-navbar></dashboard-navbar>
       <router-view name="header"></router-view>
 
-      <div
-        :class="{ content: !isFullScreenRoute }"
-        @click="toggleSidebar"
-      >
+      <div :class="{ content: !isFullScreenRoute }" @click="toggleSidebar">
         <zoom-center-transition :duration="200" mode="out-in">
           <!-- your content here -->
           <nuxt></nuxt>
@@ -85,102 +89,102 @@
   </div>
 </template>
 <script>
-  /* eslint-disable no-new */
-  import PerfectScrollbar from 'perfect-scrollbar';
-  import 'perfect-scrollbar/css/perfect-scrollbar.css';
-  import SidebarShare from '@/components/Layout/SidebarSharePlugin';
-  function hasElement(className) {
-    return document.getElementsByClassName(className).length > 0;
+/* eslint-disable no-new */
+import PerfectScrollbar from "perfect-scrollbar";
+import "perfect-scrollbar/css/perfect-scrollbar.css";
+import SidebarShare from "@/components/Layout/SidebarSharePlugin";
+function hasElement(className) {
+  return document.getElementsByClassName(className).length > 0;
+}
+
+function initScrollbar(className) {
+  if (hasElement(className)) {
+    new PerfectScrollbar(`.${className}`);
+  } else {
+    // try to init it later in case this component is loaded async
+    setTimeout(() => {
+      initScrollbar(className);
+    }, 100);
   }
+}
 
-  function initScrollbar(className) {
-    if (hasElement(className)) {
-      new PerfectScrollbar(`.${className}`);
-    } else {
-      // try to init it later in case this component is loaded async
-      setTimeout(() => {
-        initScrollbar(className);
-      }, 100);
-    }
-  }
+import DashboardNavbar from "@/components/Layout/DashboardNavbar.vue";
+import ContentFooter from "@/components/Layout/ContentFooter.vue";
+import DashboardContent from "@/components/Layout/Content.vue";
+import { SlideYDownTransition, ZoomCenterTransition } from "vue2-transitions";
 
-  import DashboardNavbar from '@/components/Layout/DashboardNavbar.vue';
-  import ContentFooter from '@/components/Layout/ContentFooter.vue';
-  import DashboardContent from '@/components/Layout/Content.vue';
-  import { SlideYDownTransition, ZoomCenterTransition } from 'vue2-transitions';
-
-  export default {
-    components: {
-      DashboardNavbar,
-      ContentFooter,
-      DashboardContent,
-      SlideYDownTransition,
-      ZoomCenterTransition,
-      SidebarShare
+export default {
+  components: {
+    DashboardNavbar,
+    ContentFooter,
+    DashboardContent,
+    SlideYDownTransition,
+    ZoomCenterTransition,
+    SidebarShare,
+  },
+  data() {
+    return {
+      sidebarBackground: "vue", //vue|blue|orange|green|red|primary
+    };
+  },
+  computed: {
+    isFullScreenRoute() {
+      return this.$route.path === "/maps/full-screen";
     },
-    data() {
-      return {
-        sidebarBackground: 'vue' //vue|blue|orange|green|red|primary
-      };
-    },
-    computed: {
-      isFullScreenRoute() {
-        return this.$route.path === '/maps/full-screen'
+  },
+  methods: {
+    toggleSidebar() {
+      if (this.$sidebar.showSidebar) {
+        this.$sidebar.displaySidebar(false);
       }
     },
-    methods: {
-      toggleSidebar() {
-        if (this.$sidebar.showSidebar) {
-          this.$sidebar.displaySidebar(false);
-        }
-      },
-      initScrollbar() {
-        let docClasses = document.body.classList;
-        let isWindows = navigator.platform.startsWith('Win');
-        if (isWindows) {
-          // if we are on windows OS we activate the perfectScrollbar function
-          initScrollbar('sidebar');
-          initScrollbar('main-panel');
-          initScrollbar('sidebar-wrapper');
+    initScrollbar() {
+      let docClasses = document.body.classList;
+      let isWindows = navigator.platform.startsWith("Win");
+      if (isWindows) {
+        // if we are on windows OS we activate the perfectScrollbar function
+        initScrollbar("sidebar");
+        initScrollbar("main-panel");
+        initScrollbar("sidebar-wrapper");
 
-          docClasses.add('perfect-scrollbar-on');
-        } else {
-          docClasses.add('perfect-scrollbar-off');
-        }
+        docClasses.add("perfect-scrollbar-on");
+      } else {
+        docClasses.add("perfect-scrollbar-off");
       }
     },
-    mounted() {
-      this.initScrollbar();
-    }
-  };
+  },
+  mounted() {
+    this.initScrollbar();
+  },
+};
 </script>
 <style lang="scss">
-  $scaleSize: 0.95;
-  @keyframes zoomIn95 {
-    from {
-      opacity: 0;
-      transform: scale3d($scaleSize, $scaleSize, $scaleSize);
-    }
-    to {
-      opacity: 1;
-    }
+$scaleSize: 0.95;
+@keyframes zoomIn95 {
+  from {
+    opacity: 0;
+    transform: scale3d($scaleSize, $scaleSize, $scaleSize);
   }
+  to {
+    opacity: 1;
+  }
+}
 
-  .main-panel .zoomIn {
-    animation-name: zoomIn95;
-  }
+.main-panel .zoomIn {
+  animation-name: zoomIn95;
+}
 
-  @keyframes zoomOut95 {
-    from {
-      opacity: 1;
-    }
-    to {
-      opacity: 0;
-      transform: scale3d($scaleSize, $scaleSize, $scaleSize);
-    }
+@keyframes zoomOut95 {
+  from {
+    opacity: 1;
   }
+  to {
+    opacity: 0;
+    transform: scale3d($scaleSize, $scaleSize, $scaleSize);
+  }
+}
 
-  .main-panel .zoomOut {
-    animation-name: zoomOut95;
-  }
+.main-panel .zoomOut {
+  animation-name: zoomOut95;
+}
 </style>
