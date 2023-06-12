@@ -25,6 +25,12 @@
       </card>
     </div>
     <card class="col-md-9">
+      <el-tabs v-model="filters.transactionType">
+        <el-tab-pane label="Salidas" name="checkout"></el-tab-pane>
+        <el-tab-pane label="Entradas" name="checking"></el-tab-pane>
+        <el-tab-pane label="Garantias" name="warranty"></el-tab-pane>
+        <el-tab-pane label="Ventas" name="sale"></el-tab-pane>
+      </el-tabs>
       <el-table :data="orders.orders" class="table-striped">
         <el-table-column type="expand">
           <template slot-scope="{ row }">
@@ -60,10 +66,6 @@
             </p>
           </div>
         </el-table-column>
-        <el-table-column
-          label="Asignado por"
-          property="createdBy.username"
-        ></el-table-column>
         <el-table-column min-width="90" header-align="right" label="Acciones">
           <div slot-scope="{ row }" class="text-right">
             <el-tooltip content="Información" :open-delay="300" placement="top">
@@ -148,77 +150,24 @@
       >
         <card>
           <el-form @submit.native.prevent>
-            <base-input label="Modelo">
+            <base-input
+              label="Asignado a"
+              v-if="filters.transactionType == 'checkout'"
+            >
               <el-select
-                v-model="filters.modelId"
+                v-model="filters.assignmentType"
                 clearable
                 filterable
                 class="select-success"
-                placeholder="Selecciona una modelo"
-                label="Categoria"
+                placeholder="Selecciona una opcion"
+                label="Tipo de asignacion"
                 style="width: 100%"
               >
                 <el-option
-                  v-for="option in models"
-                  :key="option.id"
-                  :value="option.id"
-                  :label="`${option.category.name} - ${option.name} - ${option.brand?.name}`"
-                >
-                </el-option>
-              </el-select>
-            </base-input>
-            <base-input type="text" label="Categoria">
-              <el-select
-                v-model="filters.categoryId"
-                class="select-success"
-                placeholder="Selecciona una categoria"
-                label="Categoria"
-                style="width: 100%"
-                filterable
-              >
-                <el-option
-                  v-for="option in categories"
-                  :key="option.id"
-                  :value="option.id"
-                  :label="option.name"
-                >
-                </el-option>
-              </el-select>
-            </base-input>
-            <base-input type="text" label="Estado">
-              <el-select
-                v-model="filters.stateId"
-                class="select-success"
-                placeholder="Selecciona un estado"
-                label="Estado"
-                style="width: 100%"
-                filterable
-                clearable
-              >
-                <el-option
-                  v-for="option in states"
-                  :key="option.id"
-                  :value="option.id"
-                  :label="`${option.id} - ${option.name}`"
-                >
-                  {{ option.id }} - {{ option.name }}
-                </el-option>
-              </el-select>
-            </base-input>
-            <base-input type="text" label="Marca">
-              <el-select
-                v-model="filters.brandId"
-                class="select-success"
-                placeholder="Selecciona una marca"
-                filterable
-                label="Marca"
-                style="width: 100%"
-              >
-                <el-option
-                  v-for="option in brands"
-                  :key="option.id"
-                  :value="option.id"
-                  :label="option.name"
+                  v-for="option in assignmentTypes"
+                  :key="option.type"
+                  :value="option.type"
+                  :label="option.label"
                 >
                 </el-option>
               </el-select>
@@ -234,7 +183,6 @@
               >
               </el-date-picker>
             </base-input>
-            <base-switch label="Mostrar borrados"> </base-switch>
           </el-form>
         </card>
       </modal>
@@ -319,6 +267,8 @@ import {
   Pagination,
   Form,
   DatePicker,
+  Tabs,
+  TabPane,
 } from "element-ui";
 
 export default {
@@ -332,6 +282,8 @@ export default {
     [Pagination.name]: Pagination,
     [Form.name]: Form,
     [DatePicker.name]: DatePicker,
+    [Tabs.name]: Tabs,
+    [TabPane.name]: TabPane,
     BaseSwitch,
     Modal,
   },
@@ -341,12 +293,28 @@ export default {
         viewOrder: false,
         filter: false,
       },
-      filters: {},
+      assignmentTypes: [
+        { type: "user", label: "Usuario" },
+        { type: "location", label: "Lugar" },
+        { type: "asset", label: "Activo" },
+      ],
+      activeName: "first",
+      filters: {
+        userId: null,
+        locationId: null,
+        assetId: null,
+        sort: null,
+        order: null,
+        limit: 10,
+        offset: 0,
+        startDate: null,
+        endDate: null,
+        assignmentType: null,
+        transactionType: "checkout",
+      },
       orders: [],
       dateFilter: null,
       search: null,
-      limit: 10,
-      offset: 0,
       currentPage: 1,
       order: {},
     };
@@ -357,10 +325,26 @@ export default {
       return this.filters;
     },
   },
+  watch: {
+    filter() {
+      this.getAssignments();
+    },
+  },
   mounted() {
     this.getAssignments();
   },
   methods: {
+    handleClick(tab, event) {
+      console.log(tab, event);
+    },
+    removeNullProps(obj) {
+      for (let prop in obj) {
+        if (obj[prop] === null || obj[prop] === undefined || obj[prop] === "") {
+          delete obj[prop];
+        }
+      }
+      return obj;
+    },
     updateDateFilter() {
       if (
         this.dateFilter === null ||
@@ -375,11 +359,11 @@ export default {
       this.filters.endDate = this.dateFilter[1];
     },
     handleSizeChange(val) {
-      this.limit = val;
+      this.filters.limit = val;
       this.getAssignments();
     },
     handleCurrentChange(val) {
-      this.offset = (val - 1) * this.limit;
+      this.filters.offset = (val - 1) * this.filters.limit;
       this.getAssignments();
     },
     async getOrder(id) {
@@ -401,12 +385,11 @@ export default {
     },
     async getAssignments() {
       try {
+        const params = { ...this.filters };
+        this.removeNullProps(params);
         const toSend = {
-          params: {},
+          params,
         };
-
-        toSend.params.limit = this.limit;
-        toSend.params.offset = this.offset;
         const { data, error } = await this.$axios.get("/orders", toSend);
 
         this.orders = data;
@@ -421,5 +404,8 @@ export default {
 <style>
 .text-decoration-line-through {
   text-decoration: line-through;
+}
+.el-tabs__item {
+  color: #525f7f;
 }
 </style>
