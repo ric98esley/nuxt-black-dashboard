@@ -410,6 +410,7 @@
                 label="Categoria"
                 style="width: 100%"
                 filterable
+                clearable
               >
                 <el-option
                   v-for="option in categories"
@@ -448,6 +449,7 @@
                 filterable
                 label="Marca"
                 style="width: 100%"
+                clearable
               >
                 <el-option
                   v-for="option in brands"
@@ -469,7 +471,6 @@
               >
               </el-date-picker>
             </base-input>
-            <base-switch label="Mostrar borrados"> </base-switch>
           </el-form>
         </card>
       </modal>
