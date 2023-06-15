@@ -328,7 +328,7 @@ export default {
   watch: {
     filter() {
       this.getAssignments();
-    },
+    }
   },
   mounted() {
     this.getAssignments();
