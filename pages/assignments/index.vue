@@ -298,7 +298,6 @@ export default {
         { type: "location", label: "Lugar" },
         { type: "asset", label: "Activo" },
       ],
-      activeName: "first",
       filters: {
         userId: null,
         locationId: null,
@@ -328,7 +327,7 @@ export default {
   watch: {
     filter() {
       this.getAssignments();
-    }
+    },
   },
   mounted() {
     this.getAssignments();
@@ -386,6 +385,9 @@ export default {
     async getAssignments() {
       try {
         const params = { ...this.filters };
+        if (params.transactionType == "checking")
+          params.assignmentType = null;
+
         this.removeNullProps(params);
         const toSend = {
           params,

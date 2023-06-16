@@ -55,7 +55,7 @@
     <div class="col-md-6">
       <card>
         <h4>Historial de asignaciones</h4>
-        <el-table :data="asset?.assignments">
+        <el-table :data="assignments">
           <el-table-column type="expand">
             <template slot-scope="{ row }">
               <div class="row">
@@ -89,6 +89,12 @@
             <template slot-scope="{ row }">
               <div v-if="row.assignmentType === 'location'">
                 {{ row.location?.code }}- {{ row.location?.name }}
+              </div>
+              <div v-if="row.assignmentType === 'user'">
+                {{ row.user?.username }}- {{ row.user?.name }}
+              </div>
+              <div v-if="row.assignmentType === 'asset'">
+                {{ row.asset?.serial }}
               </div>
             </template>
             <template slot-scope="{ row }">
@@ -204,6 +210,7 @@ export default {
   data() {
     return {
       asset: {},
+      assignments: [],
       id: this.$route.params.id,
       modals: {
         updateAsset: false,
@@ -241,8 +248,9 @@ export default {
       return fechaFormateada;
     },
     async getAsset() {
-      const { data } = await this.$axios.get(`/assets/${this.id}`);
-      this.asset = data;
+      const { data } = await this.$axios.get(`/assets/${this.id}/assignments`);
+      this.asset = data.target;
+      this.assignments = data.assignments.rows
     },
     async getStatus() {
       try {
