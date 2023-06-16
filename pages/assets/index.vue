@@ -672,8 +672,6 @@ export default {
         const toSend = {
           params,
         };
-
-        console.log(params);
         const { data, error } = await this.$axios.get("/assets", toSend);
         this.assets = data;
       } catch (error) {
@@ -730,12 +728,26 @@ export default {
       try {
         let toSend = { ...this.asset };
         this.removeNullProps(toSend);
-        const { data, error } = await this.$axios.post("/assets", toSend);
-        this.$notify({
-          message: `Activo creado correctamente,
-          serial: ${data.serial}`,
-          type: "success",
+        const { data, error } = await this.$axios.post("/assets", {
+          assets: [toSend],
         });
+
+        for (const asset of data.created) {
+          console.log(asset)
+          this.$notify({
+            message: `Activo creado correctamente,
+              serial: ${asset.serial}`,
+            type: "success",
+          });
+        }
+        for (const asset of data.errors) {
+          console.log(asset)
+          this.$notify({
+            message: `Activo duplicado,
+              serial: ${asset.serial}`,
+            type: "danger",
+          });
+        }
         this.asset.serial = null;
         this.getAssets();
       } catch (error) {
