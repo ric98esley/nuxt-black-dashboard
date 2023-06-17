@@ -84,7 +84,7 @@
           </el-table-column>
           <el-table-column min-width="100" header-align="right" label="Borrar">
             <div slot-scope="{ row }" class="text-right">
-              <el-tooltip content="Agregar" :open-delay="300" placement="top">
+              <el-tooltip content="Eliminar" :open-delay="300" placement="top">
                 <base-button
                   type="danger"
                   size="sm"

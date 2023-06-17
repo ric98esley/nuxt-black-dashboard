@@ -29,10 +29,10 @@
       <h4 slot="header" class="card-title">Lista de activos</h4>
       <el-table :data="assets.assets" class="table-striped">
         <el-table-column type="expand">
-          <template slot-scope="props">
+          <template slot-scope="{ row }">
             <p>
-              Creado por: {{ props.row.createdBy.name }}
-              {{ props.row.createdBy.lastName }}
+              Creado por: {{ row.createdBy.name }}
+              {{ row.createdBy.lastName }}
             </p>
             <p>
               Creado el : {{ new Date(props.row.createdAt).toLocaleString() }}
@@ -582,12 +582,6 @@ export default {
       models: [],
       states: [],
       stateOptions: ["asignado", "desplegable", "pendiente", "archivado"],
-      roles: [
-        { label: "Taquilla", value: "taquilla" },
-        { label: "Técnico", value: "tecnico" },
-        { label: "Auditor", value: "auditor" },
-        { label: "Superusuario", value: "superusuario" },
-      ],
       model: {
         name: null,
         brandId: null,
@@ -733,7 +727,7 @@ export default {
         });
 
         for (const asset of data.created) {
-          console.log(asset)
+          console.log(asset);
           this.$notify({
             message: `Activo creado correctamente,
               serial: ${asset.serial}`,
@@ -741,7 +735,7 @@ export default {
           });
         }
         for (const asset of data.errors) {
-          console.log(asset)
+          console.log(asset);
           this.$notify({
             message: `Activo duplicado,
               serial: ${asset.serial}`,
