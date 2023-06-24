@@ -60,19 +60,24 @@
           </div>
         </div>
 
-        <base-button @click="addAsset" type="success" class="btn-fill" :disabled="!asset.serial || !asset.modelId || !asset.stateId">
+        <base-button
+          @click="addAsset"
+          type="success"
+          class="btn-fill"
+          :disabled="!asset.serial || !asset.modelId || !asset.stateId"
+        >
           Añadir activo
         </base-button>
       </el-form>
     </card>
     <card class="col-md-8">
-      <el-table :data="assets"
-        >
+      <el-table :data="assets">
         <el-table-column sortable label="Serial" property="serial">
         </el-table-column>
         <el-table-column sortable label="Modelo">
-
-
+          <div slot-scope="{ row }">
+            {{ printModel({id: row.modelId })}}
+          </div>
         </el-table-column>
         <el-table-column min-width="100" header-align="right" label="Borrar">
           <div slot-scope="{ row }" class="text-right">
@@ -186,8 +191,15 @@ export default {
     },
     addAsset() {
       const toAdd = { ...this.asset };
-      if(!toAdd.serial || !toAdd.modelId || !toAdd.stateId) return;
+      if (!toAdd.serial || !toAdd.modelId || !toAdd.stateId) return;
       this.assets.push(toAdd);
+    },
+    printModel({ id }) {
+
+      const obj = this.models.find((objeto) => {
+          return objeto.id === id
+        });
+      return `${obj?.category?.name} - ${obj?.brand?.name} - ${obj?.name}`;
     },
   },
 };

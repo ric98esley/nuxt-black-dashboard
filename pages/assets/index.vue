@@ -204,7 +204,7 @@
             <base-button native-type="submit" type="primary" class="btn-fill">
               Crear activo
             </base-button>
-            <base-button link>¿Agregar Varios?</base-button>
+            <base-button link > <nuxt-link to="/assets/bulk"> ¿Agregar Varios? </nuxt-link></base-button>
           </form>
         </card>
       </modal>
