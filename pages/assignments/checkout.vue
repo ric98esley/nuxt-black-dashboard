@@ -305,9 +305,6 @@ export default {
     handleSelect(item) {
       this.target = item;
     },
-    handleIconClick(ev) {
-      console.log(ev);
-    },
     formatData(data) {
       const toSend = data.map((asset) => {
         return {
