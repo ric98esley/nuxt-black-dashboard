@@ -68,83 +68,67 @@
           >
             Añadir activo
           </base-button>
-        </el-form>
-      </card>
-      <card>
-        <h2>Datos de la factura</h2>
-        <el-form @submit.native.prevent="">
-          <base-input
-            label="Codigo de la factura"
-            v-model="invoice.code"
-            type="text"
-            clearable
-          ></base-input>
-          <base-input label="Proveedor">
-            <el-autocomplete
-              type="text"
-              clearable
-              :fetch-suggestions="searchProvider"
-              placeholder="Buscar Provedor"
-              @select="handleSelectProvider"
-              v-model="provider.name"
-              class="w-100"
-            >
-              <template #default="{ item }">
-                <div class="value">
-                  <b>{{ item.name }}</b
-                  >, <span class="link">{{ item.rif }}</span>
-                </div>
-              </template>
-            </el-autocomplete>
-          </base-input>
-          <base-input
-            label="Total de la factura"
-            type="number"
-            v-model="invoice.total"
+          <base-button
+            @click="addAsset"
+            type="success"
+            class="btn-fill"
+            :disabled="!asset.serial || !asset.modelId || !asset.stateId"
           >
-          </base-input>
-          <base-input label="Fecha de la factura">
-            <el-date-picker
-              v-model="invoice.invoiceDate"
-              type="date"
-              placeholder="Elige la fecha de facturacion"
-            ></el-date-picker>
-          </base-input>
+            Añadir activo
+          </base-button>
         </el-form>
-      </card>
-      <card>
-        <base-button @click="addAssets">Guardar</base-button>
-      </card>
-      <card>
-        <base-input label="Buscar factura">
-          <el-autocomplete
-            type="text"
-            clearable
-            :fetch-suggestions="searchInvoice"
-            placeholder="Buscar factura"
-            @select="handleSelectInvoice"
-            v-model="invoice.code"
-            class="w-100"
-          >
-            <template #default="{ item }">
-              <div class="value">
-                <b>{{ item.code }}</b
-                >, <span class="link">{{ item.provider?.name }}</span>
-              </div>
-            </template>
-          </el-autocomplete>
-        </base-input>
       </card>
     </div>
+    <!-- table -->
     <div class="col-md-8">
       <card>
         <el-table :data="assets">
           <el-table-column sortable label="Serial" property="serial">
           </el-table-column>
           <el-table-column sortable label="Modelo">
-            <div slot-scope="{ row }">
-              {{ printModel({ id: row.modelId }) }}
-            </div>
+            <base-input type="text" slot-scope="{ row }">
+              <el-select
+                v-model="row.modelId"
+                class="select-success"
+                placeholder="Selecciona un estado"
+                label="Estados"
+                style="width: 100%"
+                name="Modelo de activo"
+                filterable
+              >
+                <el-option
+                  v-for="option in models"
+                  :key="option.id"
+                  :value="option.id"
+                  :label="`${option?.category?.name} - ${option?.brand?.name} - ${option?.name}`"
+                >
+                  {{ option?.category?.name }} - {{ option?.brand?.name }} -
+                  {{ option?.name }}
+                </el-option>
+              </el-select>
+            </base-input>
+          </el-table-column>
+          <el-table-column sortable label="Estado">
+            <base-input type="text" slot-scope="{ row }">
+              <el-select
+                v-model="row.stateId"
+                class="select-success"
+                placeholder="Selecciona un estado"
+                label="Estados"
+                style="width: 100%"
+                name="assetState"
+                filterable
+              >
+                <el-option
+                  v-for="option in states"
+                  :key="option.id"
+                  :value="option.id"
+                  :label="`${option.id} - ${option.name}`"
+                >
+                  {{ option.id }} - {{ option.name }}
+                </el-option>
+              </el-select>
+            </base-input>
           </el-table-column>
           <el-table-column min-width="100" header-align="right" label="Borrar">
             <div slot-scope="{ row }" class="text-right">
@@ -162,6 +146,76 @@
           </el-table-column>
         </el-table>
       </card>
+    </div>
+    <!-- modals -->
+    <div>
+      <modal>
+        <card>
+          <h2>Datos de la factura</h2>
+          <el-form @submit.native.prevent="">
+            <base-input
+              label="Codigo de la factura"
+              v-model="invoice.code"
+              type="text"
+              clearable
+            ></base-input>
+            <base-input label="Proveedor">
+              <el-autocomplete
+                type="text"
+                clearable
+                :fetch-suggestions="searchProvider"
+                placeholder="Buscar Provedor"
+                @select="handleSelectProvider"
+                v-model="provider.name"
+                class="w-100"
+              >
+                <template #default="{ item }">
+                  <div class="value">
+                    <b>{{ item.name }}</b
+                    >, <span class="link">{{ item.rif }}</span>
+                  </div>
+                </template>
+              </el-autocomplete>
+            </base-input>
+            <base-input
+              label="Total de la factura"
+              type="number"
+              v-model="invoice.total"
+            >
+            </base-input>
+            <base-input label="Fecha de la factura">
+              <el-date-picker
+                v-model="invoice.invoiceDate"
+                type="date"
+                placeholder="Elige la fecha de facturacion"
+              ></el-date-picker>
+            </base-input>
+          </el-form>
+        </card>
+        <card>
+          <base-input label="Buscar factura">
+            <el-autocomplete
+              type="text"
+              clearable
+              :fetch-suggestions="searchInvoice"
+              placeholder="Buscar factura"
+              @select="handleSelectInvoice"
+              v-model="invoice.code"
+              class="w-100"
+            >
+              <template #default="{ item }">
+                <div class="value">
+                  <b>{{ item.code }}</b
+                  >, <span class="link">{{ item.provider?.name }}</span>
+                </div>
+              </template>
+            </el-autocomplete>
+          </base-input>
+        </card>
+        <card>
+          <base-button @click="addAssets">Guardar</base-button>
+        </card>
+      </modal>
     </div>
   </div>
 </template>
@@ -207,6 +261,9 @@ export default {
         providerId: null,
         total: null,
         invoiceDate: null,
+      },
+      modals: {
+        choose: false,
       },
       provider: {},
       assets: [],
@@ -328,12 +385,6 @@ export default {
         this.assets.splice(index, 1);
       }
     },
-    printModel({ id }) {
-      const obj = this.models.find((objeto) => {
-        return objeto.id === id;
-      });
-      return `${obj?.category?.name} - ${obj?.brand?.name} - ${obj?.name}`;
-    },
     async addAssets() {
       try {
         const assets = this.assets;
@@ -341,7 +392,6 @@ export default {
         const invoiceId = invoice.id;
 
         delete invoice.id;
-
 
         const toSend = {};
         if (invoiceId) toSend.invoiceId = invoiceId;
