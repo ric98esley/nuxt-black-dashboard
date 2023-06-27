@@ -2,18 +2,43 @@
   <div class="row">
     <div class="col-12">
       <h1>Auditorias: Historial de asignaciones</h1>
-      <base-input label="Desde">
-        <el-date-picker
-          type="daterange"
-          class="bg-transparent"
-          size="large"
-          clearable
-          v-model="dateFilter"
-          @change="updateDateFilter"
-          :default-time="['00:00:00', '23:59:59']"
-        >
-        </el-date-picker>
-      </base-input>
+      <div class="col-12">
+        <card>
+          <div class="row">
+            <div class="col-6">
+              <base-input
+                label="Buscar activo"
+                v-model="filter.serial"
+                clearable
+              ></base-input>
+            </div>
+            <base-input label="Desde">
+              <el-date-picker
+                type="daterange"
+                class="bg-transparent"
+                size="large"
+                clearable
+                v-model="dateFilter"
+                @change="updateDateFilter"
+                :default-time="['00:00:00', '23:59:59']"
+              >
+              </el-date-picker>
+            </base-input>
+            <div class="col-1 row justify-content-center align-items-center">
+              <el-tooltip content="Filtrar" :open-delay="300" placement="top">
+                <base-button
+                  type="info"
+                  size="sm"
+                  icon
+                  @click="modals.filter = true"
+                >
+                  <i class="fa fa-solid fa-filter"></i>
+                </base-button>
+              </el-tooltip>
+            </div>
+          </div>
+        </card>
+      </div>
     </div>
     <div col-12>
       <card>
@@ -75,7 +100,136 @@
             </div>
           </el-table-column>
         </el-table>
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page.sync="currentPage"
+          :page-sizes="[10, 20, 30, 40, 50, 100]"
+          :page-size="10"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="assignments.total"
+        >
+        </el-pagination>
       </card>
+    </div>
+    <!-- modals -->
+    <div>
+      <modal :show.sync="modals.filter">
+        <card>
+          <el-form @submit.native.prevent="">
+            <div class="row">
+              <div class="col-md-12">
+                <base-input type="text" label="Tipo de asignacion">
+                  <el-select
+                    class="select-success"
+                    filterable
+                    style="width: 100%"
+                    v-model="filters.assignmentType"
+                    clearable
+                  >
+                    <el-option key="user" value="user" label="Usuario">
+                    </el-option>
+                    <el-option key="location" value="location" label="Lugar">
+                    </el-option>
+                    <el-option key="Activo" value="asset" label="Activo">
+                    </el-option>
+                  </el-select>
+                </base-input>
+                <div class="col-md-12">
+                  <base-input
+                    label="Asignado a"
+                    type="text"
+                    v-if="filters.assignmentType === 'user'"
+                  >
+                    <el-autocomplete
+                      :trigger-on-focus="false"
+                      clearable
+                      v-model="target.name"
+                      :fetch-suggestions="searchUsers"
+                      placeholder="Buscar usuario"
+                      @select="handleSelect"
+                      class="w-100"
+                    >
+                      <template #default="{ item }">
+                        <div class="value">
+                          <b>{{ item.username }}</b
+                          >, <span class="link">{{ item.role }}</span>
+                        </div>
+                      </template>
+                    </el-autocomplete>
+                  </base-input>
+                  <base-input
+                    label="Asignado a"
+                    type="text"
+                    v-if="filters.assignmentType === 'asset'"
+                  >
+                    <el-autocomplete
+                      :trigger-on-focus="false"
+                      clearable
+                      v-model="target.serial"
+                      :fetch-suggestions="searchAsset"
+                      placeholder="Buscar activo"
+                      @select="handleSelect"
+                      class="w-100"
+                    >
+                      <template #default="{ item }">
+                        <div class="value">
+                          <b>{{ item.serial }}</b
+                          >, <span class="link">{{ item.state.name }}</span>
+                        </div>
+                      </template>
+                    </el-autocomplete>
+                  </base-input>
+                  <base-input
+                    label="Asignado a"
+                    type="text"
+                    v-if="filters.assignmentType === 'location'"
+                  >
+                    <el-autocomplete
+                      :trigger-on-focus="false"
+                      clearable
+                      v-model="target.name"
+                      :fetch-suggestions="searchLocations"
+                      placeholder="Buscar lugar"
+                      @select="handleSelect"
+                      class="w-100"
+                    >
+                      <template #default="{ item }">
+                        <div class="value">
+                          <b>{{ item.name }}</b
+                          >, <span class="link">{{ item.code }}</span>
+                        </div>
+                      </template>
+                    </el-autocomplete>
+                  </base-input>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <base-input type="text" label="Modelo" v-model="filters.model">
+                </base-input>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <base-input type="text" label="Marca" v-model="filters.brand">
+                </base-input>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <base-input
+                  type="text"
+                  label="Categoria"
+                  v-model="filters.category"
+                >
+                </base-input>
+              </div>
+            </div>
+          </el-form>
+        </card>
+      </modal>
     </div>
   </div>
 </template>
@@ -91,6 +245,7 @@ import {
   DatePicker,
   Tabs,
   TabPane,
+  Autocomplete,
 } from "element-ui";
 export default {
   middleware: "authenticated",
@@ -105,6 +260,7 @@ export default {
     [DatePicker.name]: DatePicker,
     [Tabs.name]: Tabs,
     [TabPane.name]: TabPane,
+    [Autocomplete.name]: Autocomplete,
     BaseSwitch,
     Modal,
   },
@@ -112,12 +268,17 @@ export default {
     return {
       transactionType: "checkout",
       dateFilter: null,
+      currentPage: 1,
+      modals: {
+        filter: false,
+      },
+      target: {},
       filters: {
         userId: null,
         locationId: null,
         assetId: null,
         assignmentType: null,
-        limit: 50,
+        limit: 10,
         offset: 0,
         sort: "checkoutAt",
         order: "DESC",
@@ -128,6 +289,9 @@ export default {
         checkingAtTo: null,
         checkoutAtFrom: null,
         checkoutAtTo: null,
+        model: null,
+        category: null,
+        brand: null,
       },
       assignments: {
         assignments: [],
@@ -150,6 +314,30 @@ export default {
     this.getAssignments();
   },
   methods: {
+    handleSelect(item) {
+      switch (this.filters.assignmentType) {
+        case "user":
+          this.filters.userId = item.id;
+          this.filters.assetId = null;
+          this.filters.locationId = null;
+          break;
+        case "asset":
+          this.filters.userId = null;
+          this.filters.assetId = item.id;
+          this.filters.locationId = null;
+          break;
+        case "location":
+          this.filters.userId = null;
+          this.filters.assetId = null;
+          this.filters.locationId = item.id;
+          break;
+        default:
+          this.filters.userId = null;
+          this.filters.assetId = null;
+          this.filters.locationId = null;
+          break;
+      }
+    },
     removeNullProps(obj) {
       for (let prop in obj) {
         if (obj[prop] === null || obj[prop] === undefined || obj[prop] === "") {
@@ -157,6 +345,14 @@ export default {
         }
       }
       return obj;
+    },
+    handleSizeChange(val) {
+      this.filters.limit = val;
+      this.getAssignments();
+    },
+    handleCurrentChange(val) {
+      this.filters.offset = (val - 1) * this.filters.limit;
+      this.getAssignments();
     },
     updateDateFilter() {
       if (
@@ -193,6 +389,12 @@ export default {
         const params = { ...this.filters };
         params.sort = `${this.transactionType}At`;
         this.removeNullProps(params);
+
+        if (!params.assignmentType) {
+          delete params.assetId;
+          delete params.locationId;
+          delete params.userId;
+        }
         const toSend = {
           params,
         };
@@ -203,6 +405,57 @@ export default {
         );
 
         this.assignments = data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async searchUsers(queryString, cb) {
+      try {
+        let toSend = {
+          params: {},
+        };
+
+        if (queryString.length > 2) {
+          toSend.params.username = queryString;
+        }
+
+        const { data, error } = await this.$axios.get("/users", toSend);
+        cb(data.users);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async searchAsset(queryString, cb) {
+      try {
+        let toSend = {
+          params: {},
+        };
+
+        if (queryString.length > 2) {
+          toSend.params.serial = queryString;
+        }
+
+        const { data, error } = await this.$axios.get("/assets", toSend);
+        cb(data.assets);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async searchLocations(queryString, cb) {
+      const toSend = {
+        params: {},
+      };
+      if (queryString.length > 2) {
+        toSend.params.code = queryString;
+      }
+
+      const { data, error } = await this.$axios.get("/locations", toSend);
+      cb(data.locations);
+    },
+    async getStatus() {
+      try {
+        const { data, error } = await this.$axios.get("/assets/status");
+        this.states = data;
       } catch (error) {
         console.log(error);
       }
