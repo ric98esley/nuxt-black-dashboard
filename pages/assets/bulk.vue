@@ -59,29 +59,30 @@
               </base-input>
             </div>
           </div>
-
-          <base-button
-            @click="addAsset"
-            type="success"
-            class="btn-fill"
-            :disabled="!asset.serial || !asset.modelId || !asset.stateId"
-          >
-            Añadir activo
-          </base-button>
-          <base-button
-            @click="addAsset"
-            type="success"
-            class="btn-fill"
-            :disabled="!asset.serial || !asset.modelId || !asset.stateId"
-          >
-            Añadir activo
-          </base-button>
+          <div class="mr-3 ml-3 row justify-content-between">
+            <base-button
+              @click="addAsset"
+              type="success"
+              class="col-md-5 btn-fill"
+              :disabled="!asset.serial || !asset.modelId || !asset.stateId"
+            >
+              Añadir activo
+            </base-button>
+            <base-button
+              @click="modals.invoice = true"
+              type="link"
+              class="col-md-5 btn-fill"
+            >
+              Agregar activos
+            </base-button>
+          </div>
         </el-form>
       </card>
     </div>
     <!-- table -->
     <div class="col-md-8">
       <card>
+        <h2>Total de activos: {{ assets.length }}</h2>
         <el-table :data="assets">
           <el-table-column sortable label="Serial" property="serial">
           </el-table-column>
@@ -149,71 +150,125 @@
     </div>
     <!-- modals -->
     <div>
-      <modal>
+      <modal :show.sync="modals.invoice">
         <card>
-          <h2>Datos de la factura</h2>
-          <el-form @submit.native.prevent="">
-            <base-input
-              label="Codigo de la factura"
-              v-model="invoice.code"
-              type="text"
-              clearable
-            ></base-input>
-            <base-input label="Proveedor">
-              <el-autocomplete
-                type="text"
-                clearable
-                :fetch-suggestions="searchProvider"
-                placeholder="Buscar Provedor"
-                @select="handleSelectProvider"
-                v-model="provider.name"
-                class="w-100"
-              >
-                <template #default="{ item }">
-                  <div class="value">
-                    <b>{{ item.name }}</b
-                    >, <span class="link">{{ item.rif }}</span>
-                  </div>
-                </template>
-              </el-autocomplete>
-            </base-input>
-            <base-input
-              label="Total de la factura"
-              type="number"
-              v-model="invoice.total"
+          <el-tabs v-model="activeTabInvoice" @tab-click="handleClick">
+            <el-tab-pane label="Factura nueva" name="factura-nueva">
+              <h2>Datos de la factura</h2>
+              <el-form @submit.native.prevent="">
+                <base-input
+                  label="Codigo de la factura"
+                  v-model="invoice.code"
+                  type="text"
+                  clearable
+                ></base-input>
+                <base-input label="Proveedor">
+                  <el-autocomplete
+                    type="text"
+                    clearable
+                    :fetch-suggestions="searchProvider"
+                    placeholder="Buscar Provedor"
+                    @select="handleSelectProvider"
+                    v-model="provider.name"
+                    class="w-100"
+                  >
+                    <template #default="{ item }">
+                      <div class="value">
+                        <b>{{ item.name }}</b
+                        >, <span class="link">{{ item.rif }}</span>
+                      </div>
+                    </template>
+                  </el-autocomplete>
+                </base-input>
+                <base-input
+                  label="Total de la factura"
+                  type="number"
+                  v-model="invoice.total"
+                >
+                </base-input>
+                <base-input label="Fecha de la factura">
+                  <el-date-picker
+                    v-model="invoice.invoiceDate"
+                    type="date"
+                    placeholder="Elige la fecha de facturacion"
+                  ></el-date-picker>
+                </base-input>
+              </el-form>
+            </el-tab-pane>
+            <el-tab-pane label="Factura antigua" name="factura-antigua">
+              <base-input label="Buscar factura">
+                <el-autocomplete
+                  type="text"
+                  clearable
+                  :fetch-suggestions="searchInvoice"
+                  placeholder="Buscar factura"
+                  @select="handleSelectInvoice"
+                  v-model="invoice.code"
+                  class="w-100"
+                >
+                  <template #default="{ item }">
+                    <div class="value">
+                      <b>{{ item.code }}</b
+                      >, <span class="link">{{ item.provider?.name }}</span>
+                    </div>
+                  </template>
+                </el-autocomplete>
+              </base-input>
+            </el-tab-pane>
+          </el-tabs>
+          <base-button @click="modals.confirm = true" class="col-md-5 btn-fill"
+            >Guardar</base-button
+          >
+          <base-button
+            @click="modals.provider = true"
+            type="link"
+            class="col-md-5 btn-fill"
+            v-if="activeTabInvoice === 'factura-nueva'"
+          >
+            Agregar Proveedor
+          </base-button>
+        </card>
+      </modal>
+      <modal :show.sync="modals.confirm">
+        <card>
+          <template slot="header">
+            <h5 class="modal-title" id="exampleModalLabel">Confirmar</h5>
+          </template>
+          <div>Guardaras {{ assets.length }} activos</div>
+          <template slot="footer">
+            <base-button type="secondary" @click="modals.confirm = false"
+              >Cerrar</base-button
             >
-            </base-input>
-            <base-input label="Fecha de la factura">
-              <el-date-picker
-                v-model="invoice.invoiceDate"
-                type="date"
-                placeholder="Elige la fecha de facturacion"
-              ></el-date-picker>
-            </base-input>
+            <base-button
+              type="success"
+              :disabled="assets.length > 0 ? false : true"
+              @click="addAssets"
+              >Guardar los cambios</base-button
+            >
+          </template>
+        </card>
+      </modal>
+      <modal :show.sync="modals.provider">
+        <card>
+          <el-form @submit.native.prevent="addProvider">
+            <div class="row">
+              <div class="col-md-12">
+                <base-input
+                  type="text"
+                  label="Nombre"
+                  v-model="newProvider.name"
+                >
+                </base-input>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <base-input type="text" label="R.I.F" v-model="newProvider.rif">
+                </base-input>
+              </div>
+            </div>
+            <base-button @click="addProvider">Agregar proveedor</base-button>
           </el-form>
-        </card>
-        <card>
-          <base-input label="Buscar factura">
-            <el-autocomplete
-              type="text"
-              clearable
-              :fetch-suggestions="searchInvoice"
-              placeholder="Buscar factura"
-              @select="handleSelectInvoice"
-              v-model="invoice.code"
-              class="w-100"
-            >
-              <template #default="{ item }">
-                <div class="value">
-                  <b>{{ item.code }}</b
-                  >, <span class="link">{{ item.provider?.name }}</span>
-                </div>
-              </template>
-            </el-autocomplete>
-          </base-input>
-        </card>
-        <card>
-          <base-button @click="addAssets">Guardar</base-button>
         </card>
       </modal>
     </div>
@@ -230,8 +285,11 @@ import {
   Form,
   DatePicker,
   Autocomplete,
+  Tabs,
+  TabPane,
 } from "element-ui";
 import BaseInput from "~/components/Inputs/BaseInput.vue";
+import Card from "~/components/Cards/Card.vue";
 
 export default {
   middleware: "authenticated",
@@ -244,9 +302,12 @@ export default {
     [Form.name]: Form,
     [DatePicker.name]: DatePicker,
     [Autocomplete.name]: Autocomplete,
+    [Tabs.name]: Tabs,
+    [TabPane.name]: TabPane,
     BaseSwitch,
     Modal,
     BaseInput,
+    Card,
   },
   data() {
     return {
@@ -263,8 +324,12 @@ export default {
         invoiceDate: null,
       },
       modals: {
-        choose: false,
+        invoice: false,
+        confirm: false,
+        provider: false,
       },
+      activeTabInvoice: "factura-nueva",
+      newProvider: {},
       provider: {},
       assets: [],
       brands: [],
@@ -283,6 +348,9 @@ export default {
     handleSelectInvoice(item) {
       this.invoice = item;
       this.invoice.providerId = item.id;
+    },
+    handleClick(tab, event) {
+      console.log(tab, event);
     },
     handleSelectProvider(item) {
       this.provider = item;
@@ -387,8 +455,8 @@ export default {
     },
     async addAssets() {
       try {
-        const assets = this.assets;
-        const invoice = this.invoice;
+        const assets = { ...this.assets };
+        const invoice = { ...this.invoice };
         const invoiceId = invoice.id;
 
         delete invoice.id;
@@ -423,6 +491,26 @@ export default {
         this.assets = [];
       } catch (error) {
         console.log(error);
+      }
+    },
+    async addProvider() {
+      try {
+        const provider = { ...this.newProvider };
+
+        const { data, error } = await this.$axios.post("/invoices/providers", provider);
+
+        this.$notify({
+          message: `Poveedor creado,
+              nombre: ${data.name}`,
+          type: "success",
+        });
+
+        this.modals.provider = false;
+      } catch (error) {
+        this.$notify({
+          message: `Poveedor no creado`,
+          type: "danger",
+        });
       }
     },
   },
