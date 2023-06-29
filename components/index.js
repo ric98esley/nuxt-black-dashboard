@@ -47,5 +47,5 @@ export {
   RouteBreadCrumb,
   Modal,
   BaseButton,
-  LoadingPanel
+  LoadingPanel,
 };

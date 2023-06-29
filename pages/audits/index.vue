@@ -48,6 +48,9 @@
           <el-tab-pane label="Garantias" name="warranty"></el-tab-pane>
           <el-tab-pane label="Ventas" name="sale"></el-tab-pane>
         </el-tabs>
+        <base-button @click="getAssignmentsCSV" type
+          >Exportar a csv</base-button
+        >
         <el-table :data="assignments?.assignments">
           <el-table-column label="Fecha" prop="checkoutAt">
             <template slot-scope="{ row }">
@@ -405,6 +408,47 @@ export default {
         );
 
         this.assignments = data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async getAssignmentsCSV() {
+      try {
+        const params = { ...this.filters };
+        params.limit = this.assignments?.total;
+        params.offset = 0;
+        params.sort = `${this.transactionType}At`;
+        this.removeNullProps(params);
+
+        if (!params.assignmentType) {
+          delete params.assetId;
+          delete params.locationId;
+          delete params.userId;
+        }
+        const toSend = {
+          params,
+          responseType: "blob",
+        };
+
+        const { data, error } = await this.$axios.get(
+          "/orders/assignments/csv",
+          toSend
+        );
+
+        const filename = "assignments.csv"; // Specify the filename for the downloaded file
+
+        // Create a temporary link element to trigger the file download
+        const url = window.URL.createObjectURL(new Blob([data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        return response.data;
+
+        return data;
       } catch (error) {
         console.log(error);
       }

@@ -455,7 +455,7 @@ export default {
     },
     async addAssets() {
       try {
-        const assets = { ...this.assets };
+        const assets =  [...this.assets] ;
         const invoice = { ...this.invoice };
         const invoiceId = invoice.id;
 
