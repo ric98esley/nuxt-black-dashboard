@@ -20,7 +20,7 @@
                 clearable
                 v-model="dateFilter"
                 @change="updateDateFilter"
-                :default-time="['00:00:00', '23:59:59']"
+                :picker-options="pickerOptions"
               >
               </el-date-picker>
             </base-input>
@@ -269,6 +269,37 @@ export default {
   },
   data() {
     return {
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: "Semana pasada",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "Mes Pasado",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "Ultimos 3 meses",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+        ],
+      },
       transactionType: "checkout",
       dateFilter: null,
       currentPage: 1,

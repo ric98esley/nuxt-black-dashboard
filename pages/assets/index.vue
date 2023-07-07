@@ -41,11 +41,23 @@
         </el-table-column>
         <el-table-column sortable label="Serial" property="serial">
         </el-table-column>
-        <el-table-column
-          sortable
-          label="Estado"
-          property="state.name"
-        ></el-table-column>
+        <el-table-column sortable label="Estado">
+          <template slot-scope="{ row }">
+            <div v-if="row.assignment">
+              <p v-if="row.assignment?.assignmentType === 'user'">
+                {{ row.assignment?.user?.username }}
+              </p>
+              <p v-if="row.assignment?.assignmentType === 'location'">
+                {{ row.assignment.location?.code }} -
+                {{ row.assignment.location?.name }}
+              </p>
+              <p v-if="row.assignment?.assignmentType === 'asset'">
+                {{ row.assignment.asset?.serial }}
+              </p>
+            </div>
+            <div v-else>{{ row.state?.name }}</div>
+          </template>
+        </el-table-column>
         <el-table-column label="Descripción">
           <template slot-scope="{ row }">
             <div>
@@ -204,7 +216,11 @@
             <base-button native-type="submit" type="primary" class="btn-fill">
               Crear activo
             </base-button>
-            <base-button link > <nuxt-link to="/assets/bulk"> ¿Agregar Varios? </nuxt-link></base-button>
+            <base-button link>
+              <nuxt-link to="/assets/bulk">
+                ¿Agregar Varios?
+              </nuxt-link></base-button
+            >
           </form>
         </card>
       </modal>
