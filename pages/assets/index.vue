@@ -30,13 +30,15 @@
       <el-table :data="assets.assets" class="table-striped">
         <el-table-column type="expand">
           <template slot-scope="{ row }">
-            <p>
-              Creado por: {{ row.createdBy.name }}
-              {{ row.createdBy.lastName }}
-            </p>
-            <p>
-              Creado el : {{ new Date(props.row.createdAt).toLocaleString() }}
-            </p>
+            <div>
+              <p>
+                Creado por: {{ row.createdBy.name }}
+                {{ row.createdBy.lastName }}
+              </p>
+              <p>
+                Creado el : {{ new Date(row.createdAt).toLocaleString() }}
+              </p>
+            </div>
           </template>
         </el-table-column>
         <el-table-column sortable label="Serial" property="serial">
