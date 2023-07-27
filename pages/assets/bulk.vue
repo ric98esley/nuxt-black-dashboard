@@ -64,6 +64,7 @@
               @click="addAsset"
               type="success"
               class="col-md-5 btn-fill"
+              native-type="submit"
               :disabled="!asset.serial || !asset.modelId || !asset.stateId"
             >
               Añadir activo
