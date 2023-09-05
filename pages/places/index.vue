@@ -107,7 +107,7 @@
                       v-for="option in zones"
                       :key="option.id"
                       :value="option.id"
-                      :label="option.zoneName"
+                      :label="option.name"
                     >
                     </el-option>
                   </el-select>
@@ -236,7 +236,7 @@
           <form @submit.prevent="addZone">
             <div class="row">
               <div class="col-md-12">
-                <base-input type="text" label="Nombre" v-model="zone.zoneName">
+                <base-input type="text" label="Nombre" v-model="zone.name">
                 </base-input>
               </div>
             </div>
@@ -292,7 +292,7 @@ export default {
       parent: {},
       group: {},
       zone: {
-        zoneName: null,
+        name: null,
       },
       location: {
         code: null,
